@@ -1,0 +1,169 @@
+---
+title: "RNA-Seq exercise"
+author: "MRC CSC Bioinformatics Core"
+date: "10/March/2016"
+Website: "http://bioinformatics.csc.mrc.ac.uk/training.html"
+output: pdf_document
+---
+
+In this exercise we will read in a count table containing counts from RNAseq experiment from erythroblast differentiation in mice This data was downloaded from GEO database (http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE49843) and aligned to mm9 by Rsubread. More details with regards to this experiment please refer to (http://www.ncbi.nlm.nih.gov/pubmed/24092935). We will perform differential expression analysis and find genes that were changed in knockdown samples versus control.
+
+* Material
+
+(1) Sample description: Exercise_ShortRNAseq_sample.info
+
+(2) Count data: Exercise_ShortRNAseq_counts.csv
+
+* set up the working directory
+
+```{r,collapse=T,warning=FALSE}
+# getwd()    # see your current directory
+# setwd()    # set up your working directory
+```
+
+* First read in counts and the sample information.
+
+```{r,collapse=T,warning=FALSE}
+
+suppressPackageStartupMessages(library(DESeq2))
+
+suppressPackageStartupMessages(library(limma))
+
+
+targets <- readTargets("Exercise_ShortRNAseq_sample.info")
+
+AllCounts<-read.csv(file="Exercise_ShortRNAseq_counts.csv",header=T,row.names=1)
+
+# see the what is in the counts.csv
+
+head(AllCounts)
+
+# We provide entrez_id as identifier for this exercise
+
+cData<-data.frame(name=targets$sample,condition=targets$condition,batch=targets$batch)
+
+dds<-DESeqDataSetFromMatrix(countData= AllCounts,colData=cData,design=~batch+condition)
+
+```
+
+* Please perform the PCA analysis.
+
+```{r, echo=T}
+ 
+rld<-rlog(dds)
+
+plotPCA(rld, intgroup="condition")
+
+```
+
+Now you have the count table as deseqdataset, you can start to perform the DE analysis.
+
+* Find the number of genes that are changed in knockdown samples versus control at FDR 0.05 irrespective of fold change.
+
+* Find the number of genes that are changed because of batch at FDR 0.05 irrespective of fold change.
+
+
+
+```{r, echo=T,warnings=F,collapse=T}
+
+dds<-DESeq(dds)
+
+res1<-results(dds, contrast=c("condition","KOa","FFa"))
+
+res2<-results(dds, contrast=c("condition","KOb","FFa"))
+
+res3<-results(dds, contrast=c("batch","b","a"))
+
+summary(res1,alpha=0.05)
+
+
+```
+
+
+* This time, use likelihood ratio test instead of the wald test.
+
+* Find the number of genes that are changed because of condition at FDR 0.05 irrespective of fold change.
+
+* Find the number of genes that are changed because of batch at FDR 0.05 irrespective of fold change.
+
+```{r, echo=T,warnings=F,collapse=T}
+
+ddsLRT<-DESeqDataSetFromMatrix(countData=AllCounts,colData=cData,design=~batch+condition)
+
+# LRT analysis for the condition effect
+ddsLRT_con <- DESeq(ddsLRT, test="LRT", full=~batch+condition, reduced=~batch) 
+
+resddsLRT_con<-results(ddsLRT_con)
+
+summary(resddsLRT_con,alpha=0.05)
+
+resLRTorder<-resddsLRT_con[order(resddsLRT_con$padj),]
+
+# LRT analysis for the batch effect
+
+ddsLRT_batch <- DESeq(ddsLRT, test="LRT", full=~batch+condition, reduced=~condition)
+
+resddsLRT_batch<-results(ddsLRT_batch)
+
+summary(resddsLRT_batch,alpha=0.05)
+
+```
+
+Using the genes that are changed because of condition at FDR 0.05 irrespective of fold change as our differentially expressed genes, perform the Gene Ontology and Pathway Enrichment Analysis.
+
+```{r, echo=T}
+
+suppressPackageStartupMessages(library(KEGG.db))
+suppressPackageStartupMessages(library(goseq))
+
+# remove the NAs
+
+resdat<- resLRTorder[complete.cases(resLRTorder$padj),]
+ 
+degenes<-as.integer(resdat$padj<0.05)
+names(degenes)<-rownames(resdat)
+    
+# remove duplicate gene names
+degenes<-degenes[match(unique(names(degenes)),names(degenes))]
+table(degenes)
+
+# Fitting the probability weighting function (PWF)
+# note, we use Entrez Gene ID as identifiler for this exercise
+# we need to choose the correct "id" for the nullp function
+# more details see
+?nullp
+
+pwf=nullp(degenes,'mm9','knownGene', plot.fit=FALSE)
+
+# Calculate  the  over  and  under  expressed  GO categories among DE genes
+go<-goseq(pwf,'mm9','knownGene', test.cats=c("GO:BP","GO:MF","KEGG"))
+
+```
+
+Change the Keggpath id to name in the goseq output
+
+```{r,eval=TRUE,echo=TRUE}
+
+# function that converts KEGG id to KEGG description
+xx <- as.list(KEGGPATHID2NAME)
+temp <- cbind(names(xx),unlist(xx))
+    
+addKeggTogoseq <- function(JX,temp){
+  for(l in 1:nrow(JX)){
+      if(JX[l,1] %in% temp[,1]){
+          JX[l,"term"] <- temp[temp[,1] %in% JX[l,1],2]
+          JX[l,"ontology"] <- "KEGG"
+      }
+  }
+  return(JX)
+}
+
+restemp<-addKeggTogoseq(go,temp)   
+
+head(restemp)
+
+# save the goseq result
+write.csv(restemp,file="Exercise_ShortRNAseq_GO_Kegg_Wallenius.csv", row.names=F)
+```
+
+
