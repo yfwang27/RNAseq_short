@@ -1,3 +1,3 @@
-# short_RNAseq4review
-RNA-seq course for review
+# short_RNAseq
+RNA-seq course
 
