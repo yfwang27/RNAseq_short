@@ -1,10 +1,10 @@
 
 
 
-RNASeq Practical
+RNA-seq
 ========================================================
 author:MRC CSC Bioinformatics Core
-date:[http://bioinformatics.csc.mrc.ac.uk/training.html]
+date:[http://mrccsc.github.io/RNAseq_short/]
 width: 1440
 height: 1100
 autosize: true
@@ -18,13 +18,17 @@ RNA-seq Introduction
 
 RNA Sequencing (**RNA-seq**) is a well established technique which allows for studying expression profiles of thousands of genes/transcripts simultaneously. 
 
-![alt text](nrg2484-f1.jpg)
+<div align="center">
+<img src="nrg2484-f1.jpg" alt="gene" height="700" width="600">
+</div>
 
 * Nature Reviews Genetics 10, 57-63 (January 2009)
 
 RNA-Seq Analysis Workflow 
 =======================================================
-![alt text](flow2.jpeg)
+<div align="center">
+<img src="flow2.jpeg" alt="gene" height="900" width="450">
+</div>
 
 Contents
 ====================================
@@ -616,10 +620,13 @@ rld<-rlog(dds)
 Transformation of count data
 ========================================================
 
+<div align="center">
+<img src="gene.png" alt="gene" height="400" width="800">
+</div>
+<div align="center">
+<img src="rlog.png" alt="gene" height="400" width="800">
+</div>
 
-![alt text](gene.png)
-
-![alt text](rlog.png)
 
 
 Principal component analysis of the samples (version1)
@@ -709,7 +716,9 @@ dev.off()
 
 =======================================================
 
-![alt text](sample_dis_map.png)
+<div align="center">
+<img src="sample_dis_map.png" alt="gene" height="900" width="900">
+</div>
 
 
 Exploring results - MA plot
@@ -802,8 +811,9 @@ dev.off()
 ```
 
 =======================================================
-
-![alt text](heatmap1.png)
+<div align="center">
+<img src="heatmap1.png" alt="gene" height="900" width="900">
+</div>
 
 Heatmap of the count matrix
 ========================================================
@@ -826,7 +836,9 @@ dev.off()
 
 =======================================================
 
-![alt text](heatmap2.png)
+<div align="center">
+<img src="heatmap2.png" alt="gene" height="900" width="900">
+</div>
 
 
 
