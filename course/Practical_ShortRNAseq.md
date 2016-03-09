@@ -135,6 +135,8 @@ or in the console.
 
 
 ```r
+# use the getwd() to see where your current directory is
+# use setwd() to set up your directory in the console
 setwd("/PathToMyDownload/short_RNAseq4review")
 # e.g. setwd("~/Downloads/short_RNAseq4review")
 ```
@@ -144,12 +146,11 @@ Read sample data
 ========================================================
 id: de
 
-Read in target file by using **readTargets** function from limma package
+Read in "targets.txt" file by using read.table function
 
 
 ```r
-library(limma)
-targets <- readTargets("targets.txt")
+targets <- read.table("targets.txt",sep="\t",header=TRUE)  
 ```
 
 ========================================================
@@ -171,7 +172,7 @@ targets
 Read count data
 ========================================================
 
-Load count data
+Load count data by using read.csv function
 
 
 ```r
@@ -376,7 +377,7 @@ head(dispersions(dds))
 plotDispEsts(dds)
 ```
 
-![plot of chunk unnamed-chunk-15](practical_4Review-figure/unnamed-chunk-15-1.png)
+![plot of chunk unnamed-chunk-15](Practical_ShortRNAseq-figure/unnamed-chunk-15-1.png) 
 
 DESeq function - nbinomWaldTest()
 ========================================================
@@ -427,7 +428,7 @@ ENSMUSG00000042041   651.0023       2.973281 0.1893514  15.70245
 ENSMUSG00000034634   199.3508       4.356157 0.2806007  15.52440
                           pvalue          padj
                        <numeric>     <numeric>
-ENSMUSG00000024526 3.542564e-123 6.138201e-119
+ENSMUSG00000024526 3.542564e-123 6.138200e-119
 ENSMUSG00000032080  3.576261e-88  3.098294e-84
 ENSMUSG00000026475  1.522841e-68  8.795424e-65
 ENSMUSG00000069170  1.039555e-59  4.503090e-56
@@ -489,8 +490,8 @@ head(Allinfo)
 2 4.637784e-01 0.7740958171      Cdc45
 3 4.739384e-06 0.0001359591        H19
 4 2.438923e-01           NA      Scml2
-5 4.279190e-01 0.7499942097       Apoh
-6 2.340754e-01 0.5742776555       Narf
+5 4.279190e-01 0.7499942096       Apoh
+6 2.340754e-01 0.5742776554       Narf
 ```
 
 ```r
@@ -518,7 +519,7 @@ head(Allinfo)
 11093 ENSMUSG00000042041   651.0023       2.973281 0.1893514 15.70245
 8725  ENSMUSG00000034634   199.3508       4.356157 0.2806007 15.52440
              pvalue          padj    mgi_symbol
-4101  3.542564e-123 6.138201e-119         Cidea
+4101  3.542564e-123 6.138200e-119         Cidea
 7849   3.576261e-88  3.098294e-84         Apoa4
 5019   1.522841e-68  8.795424e-65         Rgs16
 15734  1.039555e-59  4.503090e-56         Gpr98
@@ -625,7 +626,7 @@ Principal component analysis of the samples (version1)
 plotPCA(rld, intgroup="Group")
 ```
 
-![plot of chunk unnamed-chunk-26](practical_4Review-figure/unnamed-chunk-26-1.png)
+![plot of chunk unnamed-chunk-26](Practical_ShortRNAseq-figure/unnamed-chunk-26-1.png) 
 
 ```r
 # save the plot
@@ -661,7 +662,7 @@ ggplot(data, aes(PC1, PC2,label=colData(dds)$name))+
   ylab(paste0("PC2: ",percentVar[2],"% variance"))
 ```
 
-![plot of chunk unnamed-chunk-28](practical_4Review-figure/unnamed-chunk-28-1.png)
+![plot of chunk unnamed-chunk-28](Practical_ShortRNAseq-figure/unnamed-chunk-28-1.png) 
 
 ```r
 ggsave(file="PCA_plot_version2.png")
@@ -712,7 +713,7 @@ The  function **plotMA()** shows  the  log2  fold  changes  attributable  to  a 
 plotMA(res, main="DESeq2", ylim=c(-4,4))
 ```
 
-![plot of chunk unnamed-chunk-31](practical_4Review-figure/unnamed-chunk-31-1.png)
+![plot of chunk unnamed-chunk-31](Practical_ShortRNAseq-figure/unnamed-chunk-31-1.png) 
 
 Exploring results - Plot counts
 ========================================================
@@ -723,7 +724,7 @@ Exploring results - Plot counts
 plotCounts(dds,gene=which.min(res$padj),                                                                                                 intgroup="Group")
 ```
 
-![plot of chunk unnamed-chunk-32](practical_4Review-figure/unnamed-chunk-32-1.png)
+![plot of chunk unnamed-chunk-32](Practical_ShortRNAseq-figure/unnamed-chunk-32-1.png) 
 
 
 Heatmap of the count matrix
@@ -798,6 +799,7 @@ dev.off()
 
 Heatmap of the count matrix
 ========================================================
+
 
 
 ```r
@@ -971,7 +973,7 @@ ENSMUSG00000042248  9297.1517      -2.619363 0.1594119  239.0402
 ENSMUSG00000078686 40949.7670      -2.818665 0.1711790  234.6732
                          pvalue         padj
                       <numeric>    <numeric>
-ENSMUSG00000024526 3.652753e-87 6.015718e-83
+ENSMUSG00000024526 3.652753e-87 6.015719e-83
 ENSMUSG00000069170 1.703478e-62 1.402729e-58
 ENSMUSG00000042041 1.296794e-60 7.118965e-57
 ENSMUSG00000067225 3.170087e-56 1.305204e-52
@@ -1082,7 +1084,7 @@ ENSMUSG00000033793       0    1907.0 0.12861934
    plotPWF(pwf)
 ```
 
-![plot of chunk unnamed-chunk-47](practical_4Review-figure/unnamed-chunk-47-1.png)
+![plot of chunk unnamed-chunk-47](Practical_ShortRNAseq-figure/unnamed-chunk-47-1.png) 
 
 ========================================================
 
@@ -1121,20 +1123,20 @@ head(go)
 ```
 
 ```
-        category over_represented_pvalue under_represented_pvalue
-10432 GO:0044281            1.248420e-27                        1
-2634  GO:0006082            4.778435e-27                        1
-10113 GO:0043436            1.342083e-25                        1
-6205  GO:0019752            1.222819e-24                        1
-7805  GO:0032787            1.500760e-23                        1
-3301  GO:0007155            2.295348e-20                        1
-      numDEInCat numInCat                                  term ontology
-10432        321     1466      small molecule metabolic process       BP
-2634         209      803        organic acid metabolic process       BP
-10113        203      789             oxoacid metabolic process       BP
-6205         191      736     carboxylic acid metabolic process       BP
-7805         140      477 monocarboxylic acid metabolic process       BP
-3301         220      964                         cell adhesion       BP
+       category over_represented_pvalue under_represented_pvalue
+2776 GO:0007155            1.371565e-19                        1
+5327 GO:0022610            1.371565e-19                        1
+86        01100            2.427605e-17                        1
+6116 GO:0032501            5.302956e-17                        1
+83        00982            1.239686e-16                        1
+2171 GO:0006082            1.276600e-15                        1
+     numDEInCat numInCat                             term ontology
+2776        128      448                    cell adhesion       BP
+5327        128      448              biological adhesion       BP
+86          217     1018                             <NA>     <NA>
+6116        433     2413 multicellular organismal process       BP
+83           40       79                             <NA>     <NA>
+2171        125      487   organic acid metabolic process       BP
 ```
 
 ========================================================
@@ -1146,20 +1148,20 @@ head(restemp)
 ```
 
 ```
-        category over_represented_pvalue under_represented_pvalue
-10432 GO:0044281            1.248420e-27                        1
-2634  GO:0006082            4.778435e-27                        1
-10113 GO:0043436            1.342083e-25                        1
-6205  GO:0019752            1.222819e-24                        1
-7805  GO:0032787            1.500760e-23                        1
-3301  GO:0007155            2.295348e-20                        1
-      numDEInCat numInCat                                  term ontology
-10432        321     1466      small molecule metabolic process       BP
-2634         209      803        organic acid metabolic process       BP
-10113        203      789             oxoacid metabolic process       BP
-6205         191      736     carboxylic acid metabolic process       BP
-7805         140      477 monocarboxylic acid metabolic process       BP
-3301         220      964                         cell adhesion       BP
+       category over_represented_pvalue under_represented_pvalue
+2776 GO:0007155            1.371565e-19                        1
+5327 GO:0022610            1.371565e-19                        1
+86        01100            2.427605e-17                        1
+6116 GO:0032501            5.302956e-17                        1
+83        00982            1.239686e-16                        1
+2171 GO:0006082            1.276600e-15                        1
+     numDEInCat numInCat                              term ontology
+2776        128      448                     cell adhesion       BP
+5327        128      448               biological adhesion       BP
+86          217     1018                Metabolic pathways     KEGG
+6116        433     2413  multicellular organismal process       BP
+83           40       79 Drug metabolism - cytochrome P450     KEGG
+2171        125      487    organic acid metabolic process       BP
 ```
 
 
@@ -1179,17 +1181,12 @@ Session Information
 ```
 
 ```
-R version 3.2.3 (2015-12-10)
-Platform: x86_64-redhat-linux-gnu (64-bit)
-Running under: Red Hat Enterprise Linux Workstation release 6.7 (Santiago)
+R version 3.2.2 (2015-08-14)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: OS X 10.10.5 (Yosemite)
 
 locale:
- [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
- [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
- [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
- [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
- [9] LC_ADDRESS=C               LC_TELEPHONE=C            
-[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+[1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
 
 attached base packages:
 [1] parallel  stats4    stats     graphics  grDevices utils     datasets 
@@ -1197,46 +1194,48 @@ attached base packages:
 
 other attached packages:
  [1] biomaRt_2.26.1             gplots_2.17.0             
- [3] org.Mm.eg.db_3.2.3         KEGG.db_3.2.2             
- [5] AnnotationDbi_1.32.3       ggplot2_2.0.0             
+ [3] org.Mm.eg.db_2.4.6         KEGG.db_2.4.5             
+ [5] AnnotationDbi_1.32.2       ggplot2_1.0.1             
  [7] RColorBrewer_1.1-2         goseq_1.22.0              
  [9] RSQLite_1.0.0              DBI_0.3.1                 
-[11] geneLenDataBase_1.6.0      BiasedUrn_1.07            
-[13] DESeq2_1.10.1              RcppArmadillo_0.6.500.4.0 
-[15] Rcpp_0.12.3                SummarizedExperiment_1.0.2
-[17] Biobase_2.30.0             GenomicRanges_1.22.4      
-[19] GenomeInfoDb_1.6.3         IRanges_2.4.7             
-[21] S4Vectors_0.8.11           BiocGenerics_0.16.1       
-[23] edgeR_3.12.0               limma_3.26.7              
-[25] knitr_1.12.3              
+[11] geneLenDataBase_1.6.0      BiasedUrn_1.06.1          
+[13] DESeq2_1.10.0              RcppArmadillo_0.6.300.2.0 
+[15] Rcpp_0.12.2                SummarizedExperiment_1.0.1
+[17] Biobase_2.30.0             GenomicRanges_1.22.1      
+[19] GenomeInfoDb_1.6.1         IRanges_2.4.5             
+[21] S4Vectors_0.8.4            BiocGenerics_0.16.1       
+[23] edgeR_3.12.0               limma_3.26.5              
+[25] knitr_1.11                
 
 loaded via a namespace (and not attached):
- [1] splines_3.2.3           gtools_3.5.0           
- [3] Formula_1.2-1           latticeExtra_0.6-28    
+ [1] splines_3.2.2           gtools_3.5.0           
+ [3] Formula_1.2-1           latticeExtra_0.6-26    
  [5] Rsamtools_1.22.0        lattice_0.20-33        
- [7] digest_0.6.9            XVector_0.10.0         
+ [7] digest_0.6.8            XVector_0.10.0         
  [9] colorspace_1.2-6        Matrix_1.2-3           
 [11] plyr_1.8.3              XML_3.98-1.3           
-[13] genefilter_1.52.1       zlibbioc_1.16.0        
-[15] xtable_1.8-2            GO.db_3.2.2            
+[13] genefilter_1.52.0       zlibbioc_1.16.0        
+[15] xtable_1.8-0            GO.db_3.2.2            
 [17] scales_0.3.0            gdata_2.17.0           
-[19] BiocParallel_1.4.3      annotate_1.48.0        
-[21] mgcv_1.8-11             GenomicFeatures_1.22.13
-[23] nnet_7.3-12             survival_2.38-3        
-[25] magrittr_1.5            evaluate_0.8           
-[27] nlme_3.1-124            foreign_0.8-66         
-[29] tools_3.2.3             formatR_1.2.1          
-[31] stringr_1.0.0           munsell_0.4.2          
-[33] locfit_1.5-9.1          cluster_2.0.3          
-[35] lambda.r_1.1.7          Biostrings_2.38.4      
-[37] caTools_1.17.1          futile.logger_1.4.1    
-[39] grid_3.2.3              RCurl_1.95-4.7         
-[41] bitops_1.0-6            labeling_0.3           
-[43] gtable_0.1.2            codetools_0.2-14       
-[45] GenomicAlignments_1.6.3 gridExtra_2.0.0        
-[47] rtracklayer_1.30.2      Hmisc_3.17-2           
-[49] futile.options_1.0.0    KernSmooth_2.23-15     
-[51] stringi_1.0-1           geneplotter_1.48.0     
-[53] rpart_4.1-10            acepack_1.3-3.3        
+[19] BiocParallel_1.4.0      annotate_1.48.0        
+[21] mgcv_1.8-9              GenomicFeatures_1.22.6 
+[23] nnet_7.3-11             proto_0.3-10           
+[25] survival_2.38-3         magrittr_1.5           
+[27] evaluate_0.8            nlme_3.1-122           
+[29] MASS_7.3-45             foreign_0.8-66         
+[31] tools_3.2.2             formatR_1.2.1          
+[33] stringr_1.0.0           munsell_0.4.2          
+[35] locfit_1.5-9.1          cluster_2.0.3          
+[37] lambda.r_1.1.7          Biostrings_2.38.2      
+[39] caTools_1.17.1          futile.logger_1.4.1    
+[41] grid_3.2.2              RCurl_1.95-4.7         
+[43] labeling_0.3            bitops_1.0-6           
+[45] codetools_0.2-14        gtable_0.1.2           
+[47] reshape2_1.4.1          GenomicAlignments_1.6.1
+[49] gridExtra_2.0.0         rtracklayer_1.30.1     
+[51] Hmisc_3.17-0            futile.options_1.0.0   
+[53] KernSmooth_2.23-15      stringi_1.0-1          
+[55] geneplotter_1.48.0      rpart_4.1-10           
+[57] acepack_1.3-3.3        
 ```
 

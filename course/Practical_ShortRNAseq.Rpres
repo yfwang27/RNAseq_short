@@ -112,7 +112,6 @@ AllCounts.csv
 
 ```{r,eval=TRUE,echo=FALSE}
 
-library(limma)
 library(edgeR)
 library(DESeq2)
 library(goseq)
@@ -150,7 +149,8 @@ You may navigate to the unarchived short_RNAseq4review folder in the Rstudio men
 or in the console.
 
 ```{r,eval=F} 
-
+# use the getwd() to see where your current directory is
+# use setwd() to set up your directory in the console
 setwd("/PathToMyDownload/short_RNAseq4review")
 # e.g. setwd("~/Downloads/short_RNAseq4review")
 ```
@@ -160,13 +160,12 @@ Read sample data
 ========================================================
 id: de
 
-Read in target file by using **readTargets** function from limma package
+Read in "targets.txt" file by using read.table function
 
 ```{r,eval=TRUE,echo=TRUE}
 
-library(limma)
-targets <- readTargets("targets.txt")
-  
+targets <- read.table("targets.txt",sep="\t",header=TRUE)  
+
 ```
 
 ========================================================
@@ -179,7 +178,7 @@ targets
 Read count data
 ========================================================
 
-Load count data
+Load count data by using read.csv function
 
 ```{r,eval=TRUE,echo=TRUE}
 
@@ -607,6 +606,7 @@ dev.off()
 
 Heatmap of the count matrix
 ========================================================
+
 
 ```{r,eval=FALSE,echo=TRUE}
 scaled_matrix<-t(scale(t(rlog4heatmap)))
