@@ -53,7 +53,7 @@ Set working directory
 ========================================================
 
 Before running any of the code, we need to set the working directory to the folder we unarchived. 
-You may navigate to the unarchived short_RNAseq4review folder in the Rstudio menu
+You may navigate to the unarchived RNAseq_short/course folder in the Rstudio menu
 
 **Session -> Set Working Directory -> Choose Directory**
 
