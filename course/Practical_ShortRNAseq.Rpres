@@ -24,15 +24,9 @@ RNA Sequencing (**RNA-seq**) is a well established technique which allows for st
 
 * Nature Reviews Genetics 10, 57-63 (January 2009)
 
-RNA-seq introduction (continued)
-========================================================
-In this course we will use R packages available from the [Bioconductor project](https://www.bioconductor.org/).
-
-We will cover differential expression analysis starting with a count table using single and multiple factor analysis, exploring results and interpreting lists of differentially expressed genes. 
-
-For more details on quality control, read alignment and read counting you can join us on our [extended course](https://github.com/sanjaykhadayate/rnacourse/blob/master/practical.md).
-
-
+RNA-Seq Analysis Workflow 
+=======================================================
+![alt text](flow2.jpeg)
 
 Contents
 ====================================
@@ -42,6 +36,44 @@ Contents
 * [Differential gene expression analysis](#/de).
 * [Exploring and saving results](#/explore).
 * [Gene ontology and pathway enrichment analysis](#/go).
+
+
+Analysis Parameters
+========================================================
+
+Define analysis parameters
+
+```{r,eval=TRUE,echo=TRUE}
+
+
+genome<-"mm9" 
+strandspecific<-0 
+factor1<-"Group"
+isPairedEnd<-TRUE
+
+```
+
+Set working directory
+========================================================
+
+Before running any of the code, we need to set the working directory to the folder we unarchived. 
+You may navigate to the unarchived short_RNAseq4review folder in the Rstudio menu
+
+**Session -> Set Working Directory -> Choose Directory**
+
+or in the console.
+
+```{r,eval=F} 
+
+# use the getwd() to see where your current directory is
+
+# use setwd() to set up your directory in the console
+
+setwd("/PathToMyDownload/RNAseq_short/course")
+
+```
+
+**setwd("~/Downloads/RNAseq_short/course")**
 
 Quality Assessment
 ========================================================
@@ -99,13 +131,13 @@ Material
 Dataset
 * [GSE68360] (http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE68360)
 
-We have generated the following files for this session
+We have generated the following files for this session.
 
-- "target" file that contain the sample information.
+- **target** file that contain the sample information.
 
 targets.txt
 
-- "count" matrix  containing count table
+- **count** matrix  containing count table
 
 AllCounts.csv
 
@@ -123,44 +155,13 @@ library(gplots)
 library(biomaRt)
 ```
 
-Analysis Parameters
-========================================================
-
-Define analysis parameters
-
-```{r,eval=TRUE,echo=TRUE}
-
-
-genome<-"mm9" 
-strandspecific<-0 
-factor1<-"Group"
-isPairedEnd<-TRUE
-
-```
-
-Set working directory
-========================================================
-
-Before running any of the code, we need to set the working directory to the folder we unarchived. 
-You may navigate to the unarchived short_RNAseq4review folder in the Rstudio menu
-
-**Session -> Set Working Directory -> Choose Directory**
-
-or in the console.
-
-```{r,eval=F} 
-# use the getwd() to see where your current directory is
-# use setwd() to set up your directory in the console
-setwd("/PathToMyDownload/short_RNAseq4review")
-# e.g. setwd("~/Downloads/short_RNAseq4review")
-```
 
 
 Read sample data
 ========================================================
 id: de
 
-Read in "targets.txt" file by using read.table function
+Read in **targets.txt** file by using read.table function
 
 ```{r,eval=TRUE,echo=TRUE}
 
@@ -260,7 +261,7 @@ Prepare deseqdataset object (Continued)
 
 (3) construct deseqdataset object
 
-The class used by the DESeq2 package to store the read counts is **DESeqDataSet**
+The class used by the DESeq2 package to store the read counts is **DESeqDataSet**.
 
 
 ```{r,eval=TRUE,echo=TRUE}   
@@ -288,10 +289,10 @@ dds<-DESeq(dds)
 
 DESeq function - estimateSizeFactors()
 ========================================================
-The function DESeq runs the following functions in order
+The function DESeq runs the following functions in order.
 
 
-**Estimation of size factors**
+1 - **Estimation of size factors**
 
 The sizeFactors vector assigns to each column of the count matrix a value, the size factor, such that  count  values  in  the  columns  can  be  brought  to  a  common  scale  by  dividing  by  the  corresponding size factor.
 
@@ -305,9 +306,9 @@ sizeFactors(dds)
 DESeq function - estimateDispersions()
 ========================================================
 
-**Estimation of dispersion**
+2 - **Estimation of dispersion**
 
-This function obtains dispersion estimates for Negative Binomial distributed data.
+This function obtains gene-wide dispersion estimates. Then, a curve is fit to the estimates to capture the overall trend of dispersion-mean dependence. 
 
 ```{r,eval=TRUE,echo=TRUE}
 #  estimateDispersions()
@@ -320,9 +321,16 @@ plotDispEsts(dds)
 
 DESeq function - nbinomWaldTest()
 ========================================================
-**Negative Binomial GLM fitting and Wald statistics**
+3- **Hypothesis test for differential expression**
 
-This function tests for significance of coefficients in a Negative Binomial GLM, using previously calculated sizeFactors (or normalizationFactors ) and dispersion estimates.
+Finally, the function tests whether each model coefficient differs significantly from zero, using previously calculated sizeFactors and dispersion estimates.
+
+DESeq2 reports the standard error for each Log Fold Change estimate.  
+
+For significance testing, DESeq2 uses a Wald test: Log Fold Change is divided by its standard error, resulting in a z-statistic, which is compared to a standard normal distribution to generate p values.
+
+The Wald test P values  are adjusted for multiple testing using the procedure of Benjamini and Hochberg.
+
 
 ```{r,eval=TRUE,echo=TRUE}
 
@@ -430,7 +438,7 @@ Exploring results
 
 ```{r,eval=TRUE,echo=TRUE}    
  # Another way to get the results
-    res_contrast<-results(dds,                                                                                                           contrast=c("Group","Hfd","Viv")) 
+    res_contrast<-results(dds,contrast=c("Group","Hfd","Viv")) 
 
  # the result should same as "res"
     
@@ -481,6 +489,8 @@ Principal component plot of the samples (version2)
 ```{r,eval=TRUE,echo=TRUE}
 
 library(RColorBrewer)
+
+# Creates nice looking color palettes
 showcols <- brewer.pal(8, "Set1")[1:length(unique(colData(dds)$Group))]
 
 data <- plotPCA(rld, intgroup="Group", returnData=TRUE)
