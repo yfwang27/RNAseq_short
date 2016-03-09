@@ -1,9 +1,9 @@
 ---
-title: "RNA-Seq exercise"
+title: "RNA-Seq exercise solutions"
 author: "MRC CSC Bioinformatics Core"
 date: "10/March/2016"
-Website: "http://bioinformatics.csc.mrc.ac.uk/training.html"
-output: pdf_document
+output: html_document
+Website: http://bioinformatics.csc.mrc.ac.uk/training.html
 ---
 
 In this exercise we will read in a count table containing counts from RNAseq experiment from erythroblast differentiation in mice This data was downloaded from GEO database (http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE49843) and aligned to mm9 by Rsubread. More details with regards to this experiment please refer to (http://www.ncbi.nlm.nih.gov/pubmed/24092935). We will perform differential expression analysis and find genes that were changed in knockdown samples versus control.
@@ -27,10 +27,7 @@ In this exercise we will read in a count table containing counts from RNAseq exp
 
 suppressPackageStartupMessages(library(DESeq2))
 
-suppressPackageStartupMessages(library(limma))
-
-
-targets <- readTargets("Exercise_ShortRNAseq_sample.info")
+targets <- read.table("Exercise_ShortRNAseq_sample.info",sep="\t",header=TRUE)
 
 AllCounts<-read.csv(file="Exercise_ShortRNAseq_counts.csv",header=T,row.names=1)
 

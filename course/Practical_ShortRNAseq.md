@@ -1238,4 +1238,12 @@ loaded via a namespace (and not attached):
 [55] geneplotter_1.48.0      rpart_4.1-10           
 [57] acepack_1.3-3.3        
 ```
+Time for Exercises!
+=========================================================
 
+* [RNAseq Exercises](Exercise_ShortRNAseq_questions.html)
+
+Time for Solutions?
+=========================================================
+
+* [RNAseq Solutions](Exercise_ShortRNAseq.html)

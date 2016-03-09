@@ -860,4 +860,12 @@ Session Information
 ```{r,eval=TRUE,echo=TRUE}
     sessionInfo()
 ```
+Time for Exercises!
+=========================================================
 
+* [RNAseq Exercises](Exercise_ShortRNAseq_questions.html)
+
+Time for Solutions?
+=========================================================
+
+* [RNAseq Solutions](Exercise_ShortRNAseq.html)
