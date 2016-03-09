@@ -1246,4 +1246,4 @@ Time for Exercises!
 Time for Solutions?
 =========================================================
 
-* [RNAseq Solutions](Exercise_ShortRNAseq.html)
+* [RNAseq Solutions](Exercise_ShortRNAseq_Solutions.html)
