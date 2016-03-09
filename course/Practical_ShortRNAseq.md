@@ -1261,9 +1261,9 @@ loaded via a namespace (and not attached):
 Time for Exercises!
 =========================================================
 
-* [RNAseq Exercises](http://mrccsc.github.io/RNAseq_short/Exercise_ShortRNAseq_questions.html)
+* [RNAseq Exercises](http://mrccsc.github.io/RNAseq_short/course/Exercise_ShortRNAseq_questions.html)
 
 Time for Solutions?
 =========================================================
 
-* [RNAseq Solutions](http://mrccsc.github.io/RNAseq_short/Exercise_ShortRNAseq_Solutions.html)
+* [RNAseq Solutions](http://mrccsc.github.io/RNAseq_short/course/Exercise_ShortRNAseq_Solutions.html)
