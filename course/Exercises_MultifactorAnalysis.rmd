@@ -1,0 +1,23 @@
+---
+title: "Multi Factor Analysis"
+author: "MRC CSC Bioinformatics Core"
+date: "08 August 2016"
+output: html_document
+Website: http://bioinformatics.csc.mrc.ac.uk/training.html
+---
+
+1.  Using likelihood ratio test instead of the wald test,
+
+a) Find the number of genes that are changed because of condition at FDR 0.05 irrespective of fold change.
+
+b) Find the number of genes that are changed because of batch at FDR 0.05 irrespective of fold change.
+
+
+
+2. Perform multi factor analysis by adding batch as factor to design.
+
+a) Find out number of genes that are changed because of batch as opposed to because of Group.
+
+
+
+

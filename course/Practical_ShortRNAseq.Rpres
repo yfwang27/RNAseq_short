@@ -3,7 +3,7 @@ opts_chunk$set(cache=TRUE)
 ```
 
 
-RNA-seq
+Analysis of RNAseq data
 ========================================================
 author:MRC CSC Bioinformatics Core
 date:[http://mrccsc.github.io/RNAseq_short/]
@@ -42,18 +42,18 @@ Contents
 * [Gene ontology and pathway enrichment analysis](#/go).
 
 
-Analysis Parameters
+Analysis Considerations
 ========================================================
 
-Define analysis parameters
-
-```{r,eval=TRUE,echo=TRUE}
 
 
-genome<-"mm9" 
-strandspecific<-0 
-factor1<-"Group"
-isPairedEnd<-TRUE
+```{r,eval=FALSE,echo=TRUE}
+
+- Single end or paired end sequencing experiment?
+- Strand specific or non stand specific
+- How many factors involved in experiment (genotype, treatment, time course etc.)
+- What genome is involved
+- Is it a well annotated organism or a poorly annotated one. 
 
 ```
 
@@ -69,9 +69,9 @@ or in the console.
 
 ```{r,eval=F} 
 
-# use the getwd() to see where your current directory is
+Use the getwd() to see where your current directory is
 
-# use setwd() to set up your directory in the console
+Use setwd() to set up your directory in the console
 
 setwd("/PathToMyDownload/RNAseq_short/course")
 
@@ -155,7 +155,6 @@ library(RColorBrewer)
 library(ggplot2)
 library(KEGG.db)
 library(org.Mm.eg.db)
-library(gplots)
 library(biomaRt)
 ```
 
@@ -187,63 +186,32 @@ Load count data by using read.csv function
 
 ```{r,eval=TRUE,echo=TRUE}
 
-AllCounts<-read.csv(file="AllCounts.csv")
+AllCounts<-read.csv(file="AllCounts.csv",row.names = 1)
 
 ```
 
 Read count data (Continued)
 ========================================================
 ```{r,eval=TRUE,echo=TRUE}
-# show first few rows of "AllCounts" object
+# Show first few rows of "AllCounts" object
 
 head(AllCounts)
 
-# show the class of AllCounts object
+# Show the class of AllCounts object
 
 class(AllCounts)
 ```
 
-Prepare deseqdataset object
+
+Prepare deseqdataset object 
 ========================================================
 
-(1) Prepare the count matrix
-
-```{r,eval=TRUE,echo=TRUE}
-
-# Assign Gene_IDs to the rownames
-  rownames(AllCounts)<-AllCounts[,1]
-
-# Remove the Gene_IDs from AllCounts object
-  AllCounts<-AllCounts[,-1]
-  head(AllCounts)
-
-# now you can change "AllCounts" object to "matrix" class
-  AllCounts<-as.matrix(AllCounts)
-  class(AllCounts)
-  
-```
-
-Prepare deseqdataset object (Continued)
-========================================================
-```{r,eval=TRUE,echo=TRUE}
-# Remove genes counted as "0" in all samples
-
-dim(AllCounts)
-
-AllCountsKeep<-AllCounts[rowSums(AllCounts)>0,]
-dim(AllCountsKeep)
-
-```
-
-Prepare deseqdataset object (Continued)
-========================================================
-
- (2) Collect sample information
+ Collect sample information
 
 ```{r,eval=TRUE,echo=TRUE}  
 
                               
-cData<-data.frame(name=targets$Sample,                                                                                                      Group=targets$Group,Batch=targets$Batch)
+cData<-data.frame(name=targets$Sample,                                                                          Group=targets$Group,Batch=targets$Batch)
 
 rownames(cData)<-cData[,1]
 
@@ -263,7 +231,7 @@ cData$Group<-relevel(cData$Group,ref="Viv")
 Prepare deseqdataset object (Continued)
 ========================================================
 
-(3) construct deseqdataset object
+ Construct deseqdataset object
 
 The class used by the DESeq2 package to store the read counts is **DESeqDataSet**.
 
@@ -273,7 +241,7 @@ The class used by the DESeq2 package to store the read counts is **DESeqDataSet*
  library(DESeq2)
 
 dds<-DESeqDataSetFromMatrix(
-    countData= AllCountsKeep,colData=cData,
+    countData= AllCounts,colData=cData,
     design=~Group)
 ```
 
@@ -381,12 +349,12 @@ mart=useMart('ENSEMBL_MART_ENSEMBL',
 dataset='mmusculus_gene_ensembl',
 host="may2012.archive.ensembl.org")
 
-testgetbm<-getBM(attributes=c('ensembl_gene_id',                                                                                         'mgi_symbol'),
+bm<-getBM(attributes=c('ensembl_gene_id',                                                                                         'mgi_symbol'),
 filters ='ensembl_gene_id',
 values=rownames(resOrdered), mart=mart)
 
-# see the first few rows of "testgetbm" object
-head(testgetbm)      
+# see the first few rows of "bm" object
+head(bm)      
 ```
 
 Add Gene symbol (Continued)
@@ -394,7 +362,7 @@ Add Gene symbol (Continued)
 
 ```{r,eval=TRUE,echo=TRUE}    
 # merge the Gene_symbol to our DE dataset
-Allinfo <- merge(as.data.frame(resOrdered),testgetbm,by.x=0,by.y=1)
+Allinfo <- merge(as.data.frame(resOrdered),bm,by.x=0,by.y=1)
 head(Allinfo)
 # change the column name
 colnames(Allinfo)[1]<-"ensembl_gene_id"
@@ -437,11 +405,11 @@ sum(res$padj < 0.05, na.rm=TRUE)
   
 ```
 
-Exploring results
+Using Contrast
 ========================================================
 
 ```{r,eval=TRUE,echo=TRUE}    
- # Another way to get the results
+ 
     res_contrast<-results(dds,contrast=c("Group","Hfd","Viv")) 
 
  # the result should same as "res"
@@ -451,9 +419,22 @@ Exploring results
 ```
 
 
-Transformation of count data
+Exercises
+=========================================================
+
+* [RNAseq Exercises](http://mrccsc.github.io/RNAseq_short/course/Exercise_BasicDifferentialAnalysis.html)
+
+Solutions
+=========================================================
+
+* [RNAseq Solutions](http://mrccsc.github.io/RNAseq_short/course/Answers_BasicDifferentialAnalysis.html)
+
+
+Visualization of results
 ========================================================
 id: explore
+
+Transformation of count data
 
 The function **rlog** (regularized log), transforms the original count data to the log2 scale.
 
@@ -476,7 +457,7 @@ Transformation of count data
 
 
 
-Principal component analysis of the samples (version1)
+Principal component analysis of the samples
 ========================================================
 
 **PCA plot** is useful to spot individual sample outliers. 
@@ -490,7 +471,7 @@ ggsave(file="PCA_plot_version1.png")
     
 ```
 
-Principal component plot of the samples (version2)
+Principal component plot of the samples 
 ========================================================
 
 ```{r,eval=TRUE,echo=TRUE}
@@ -510,7 +491,7 @@ percentVar <- round(100 * attr(data, "percentVar"))
   Here, gets the percent variation from data object.
 
 
-PCA of the samples (version2-Contin'd)
+PCA of the samples 
 ========================================================
 
 ```{r,eval=TRUE,echo=TRUE}
@@ -563,7 +544,7 @@ dev.off()
 </div>
 
 
-Exploring results - MA plot
+MA plot
 ========================================================
 The  function **plotMA()** shows  the  log2  fold  changes  attributable  to  a  given  variable  over  the  mean of normalized counts.  Points will be colored red if the adjusted p value is less than 0.1.  Points which fall out of the window are plotted as open triangles pointing either up or down.
 
@@ -573,7 +554,7 @@ plotMA(res, main="DESeq2", ylim=c(-4,4))
 
 ```
 
-Exploring results - Plot counts
+Plot counts
 ========================================================
  **Plot of normalized counts for a single gene on log scale**
 
@@ -649,6 +630,18 @@ dev.off()
 <img src="heatmap2.png" alt="gene" height="900" width="900">
 </div>
 
+Exercises
+=========================================================
+
+* [RNAseq Exercises](http://mrccsc.github.io/RNAseq_short/course/Exercises_Visualization.html)
+
+Solutions
+=========================================================
+
+* [RNAseq Solutions](http://mrccsc.github.io/RNAseq_short/course/Answers_Visualization.html)
+
+
+
 
 
 Multi factor designs
@@ -665,7 +658,7 @@ targets
 
 ```{r,eval=TRUE,echo=TRUE}
       
-ddsMF<-DESeqDataSetFromMatrix(countData= AllCountsKeep,colData= cData,design=~ Batch + Group)
+ddsMF<-DESeqDataSetFromMatrix(countData= AllCounts,colData= cData,design=~ Batch + Group)
       
 ddsMF <- DESeq(ddsMF)
 
@@ -725,7 +718,7 @@ DESeq using LRT
 
 ```{r,eval=TRUE,echo=TRUE,message=FALSE,results='hide',warning=FALSE}
 
-ddsLRT<-DESeqDataSetFromMatrix(countData= AllCountsKeep,colData= cData,design=~ Batch + Group)
+ddsLRT<-DESeqDataSetFromMatrix(countData= AllCounts,colData= cData,design=~ Batch + Group)
 
 # We would like to see the Group effect hence the reduced=~Batch     
 ddsLRT <- DESeq(ddsLRT, test="LRT", 
@@ -752,6 +745,16 @@ summary(resLRTorder)
 
 
 ```
+
+Exercises
+=========================================================
+
+* [RNAseq Exercises](http://mrccsc.github.io/RNAseq_short/course/Exercise_FunctionalAnalysis.html)
+
+Solutions
+=========================================================
+
+* [RNAseq Solutions](http://mrccsc.github.io/RNAseq_short/course/Answers_FunctionalAnalysis.html)
 
 
 
@@ -804,7 +807,7 @@ depending on its length, given by the PWF
 ```{r,eval=TRUE,echo=TRUE}                         
 
   
-pwf=nullp(degenes,genome,'ensGene',                                                                                                          plot.fit=FALSE)
+pwf=nullp(degenes,genome="mm9",'ensGene',                                                                              plot.fit=FALSE)
   
 ```
 
@@ -849,7 +852,7 @@ categories among DE genes
 ```{r,eval=TRUE,echo=TRUE}
     
 
-go<-goseq(pwf,genome,'ensGene',                                                                                                              test.cats=c("GO:BP","GO:MF","KEGG"))
+go<-goseq(pwf,genome="mm9",'ensGene',                                                                                                              test.cats=c("GO:BP","GO:MF","KEGG"))
   
 ```
 
@@ -882,12 +885,15 @@ Session Information
 ```{r,eval=TRUE,echo=TRUE}
     sessionInfo()
 ```
-Time for Exercises!
+
+
+Exercises
 =========================================================
 
-* [RNAseq Exercises](http://mrccsc.github.io/RNAseq_short/course/Exercise_ShortRNAseq_questions.html)
+* [RNAseq Exercises](http://mrccsc.github.io/RNAseq_short/course/Exercise_FunctionalAnalysis.html)
 
-Time for Solutions?
+
+Solutions
 =========================================================
 
-* [RNAseq Solutions](http://mrccsc.github.io/RNAseq_short/course/Exercise_ShortRNAseq_Solutions.html)
+* [RNAseq Solutions](http://mrccsc.github.io/RNAseq_short/course/Answers_FunctionalAnalysis.html)

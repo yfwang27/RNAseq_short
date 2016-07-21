@@ -1,0 +1,39 @@
+---
+title: "BasicDifferentialAnalysis"
+author: "MRC CSC Bioinformatics Core"
+date: "08 August 2016"
+output: html_document
+Website: http://bioinformatics.csc.mrc.ac.uk/training.html
+---
+
+In this exercise, we will read in a count data from erythroblast differentiation experiment in mice. This data was downloaded from GEO database (http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE49843) and aligned to mm9 genome assembly using  Rsubread R package. More details with regards to this experiment please refer to (http://www.ncbi.nlm.nih.gov/pubmed/24092935). 
+
+* Material
+
+  Sample description: Exercise_ShortRNAseq_sample.info
+
+  Count data: Exercise_ShortRNAseq_counts.csv
+
+
+
+1. 
+
+   a) First read in the sample informattion and count data.
+
+   b) Identify how many factors this experiment involves.
+
+
+2. Construct DESeqDataSet object using sample information and counts data.
+
+
+Now you have the count table as deseqdataset, you can start to perform the DE analysis.
+
+3. a) Find the number of genes that are changed in knockdown samples versus control, i.e. KOa vs FFa and KOb vs FFa, at FDR 0.05 irrespective of fold change.
+
+ b) Find the number of genes that are changed in the above situation with fold change threshold, i.e. fold change ratio > 2.
+
+
+
+
+
+

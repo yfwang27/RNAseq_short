@@ -1,12 +1,12 @@
 ---
 title: "RNA-Seq exercise solutions"
 author: "MRC CSC Bioinformatics Core"
-date: "10/March/2016"
+date: "08 August 2016"
 output: html_document
 Website: http://bioinformatics.csc.mrc.ac.uk/training.html
 ---
 
-In this exercise we will read in a count table containing counts from RNAseq experiment from erythroblast differentiation in mice This data was downloaded from GEO database (http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE49843) and aligned to mm9 by Rsubread. More details with regards to this experiment please refer to (http://www.ncbi.nlm.nih.gov/pubmed/24092935). We will perform differential expression analysis and find genes that were changed in knockdown samples versus control.
+In this exercise, we will read in a count table containing counts from RNAseq experiment from erythroblast differentiation in mice. This data was downloaded from GEO database (http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE49843) and aligned to mm9 genome assembly using  Rsubread R package. More details with regards to this experiment please refer to (http://www.ncbi.nlm.nih.gov/pubmed/24092935). 
 
 * Material
 
@@ -21,9 +21,9 @@ In this exercise we will read in a count table containing counts from RNAseq exp
 # setwd()    # set up your working directory
 ```
 
-* First read in the sample and the count information.
+* First read in the sample informattion and count data.
 
-* Also, please identify how many variables this experiment contains
+* Also, identify how many factors this experiment involves.
 
 ```{r,collapse=T,warning=FALSE}
 
@@ -39,11 +39,13 @@ targets
 
 ```
 
-In this experiment, we have two variables, namely, condition and batch. (ps: we introduced the 'mock' batch variable for this exercise. In the original publication, the batch effect was not discussed).
+In this experiment, we have two factors, namely, condition and batch. (ps: we introduced the 'mock' batch factor for this exercise. In the original publication, the batch effect was not discussed).
 
-For the condition variable, we have 3 factors, namely FFa, KOa and KOb.
+For the condition factor, we have 3 levels, namely FFa, KOa and KOb.
 
-For the batch variable, we have 3 factors, namely a, b and c.
+For the batch factor, we have 3 levels, namely a, b and c.
+
+1. Construct DESeqDataSet object using sample information and counts data.
 
 ```{r,collapse=T,warning=FALSE}
 
@@ -63,7 +65,7 @@ dds<-DESeqDataSetFromMatrix(countData= AllCounts,colData=cData,design=~batch+con
 
 ```
 
-* Please perform the PCA analysis.
+2. a) Perform the Principal Component Analysis using rlog method and find out % significance values of first two principal components .
 
 ```{r, echo=T}
  
@@ -73,11 +75,21 @@ plotPCA(rld, intgroup="condition")
 
 ```
 
+ b) Repeat the PCA, this time using VST method and compare the plots with the ones obtained using rlog method.
+ 
+3. Perform sample clustering and compare it with the clusters obtained using PCA.
+
+4. Draw MA plot and highlight all significant genes with adjusted p value less than 0.05.  
+
+5. Draw a heatmap based on top 40 differentially expressed genes.
+
+6. a) Use function plotCounts() to plot the counts for gene ENSMUSG00000024526. (b) Plot the unnormalized counts.
+
 Now you have the count table as deseqdataset, you can start to perform the DE analysis.
 
-* Find the number of genes that are changed in knockdown samples versus control, i.e. KOa vs FFa and KOb vs FFa, at FDR 0.05 irrespective of fold change.
+7. a) Find the number of genes that are changed in knockdown samples versus control, i.e. KOa vs FFa and KOb vs FFa, at FDR 0.05 irrespective of fold change.
 
-* Find the number of genes that are changed in the above situation with fold change threshold, i.e. fold change ratio > 2.
+ b) Find the number of genes that are changed in the above situation with fold change threshold, i.e. fold change ratio > 2.
 
 
 ```{r, echo=T,warnings=F,collapse=T}
@@ -103,11 +115,11 @@ DE_res2<- DE_res2[DE_res2$padj<0.05 & abs(DE_res2$log2FoldChange)>1,]
 ```
 
 
-* This time, use likelihood ratio test instead of the wald test.
+8.  Using likelihood ratio test instead of the wald test,
 
-* Find the number of genes that are changed because of condition at FDR 0.05 irrespective of fold change.
+a) Find the number of genes that are changed because of condition at FDR 0.05 irrespective of fold change.
 
-* Find the number of genes that are changed because of batch at FDR 0.05 irrespective of fold change.
+b) Find the number of genes that are changed because of batch at FDR 0.05 irrespective of fold change.
 
 ```{r, echo=T,warnings=F,collapse=T}
 
@@ -122,7 +134,15 @@ summary(resddsLRT_con,alpha=0.05)
 
 resLRTorder<-resddsLRT_con[order(resddsLRT_con$padj),]
 
+```
+
+
+9. Perform multi factor analysis by adding batch as factor to design.
+
+```{r, echo=T,warnings=F,collapse=T}
+
 # LRT analysis for the batch effect
+
 
 ddsLRT_batch <- DESeq(ddsLRT, test="LRT", full=~batch+condition, reduced=~condition)
 
@@ -132,7 +152,9 @@ summary(resddsLRT_batch,alpha=0.05)
 
 ```
 
-Using the genes that are changed because of condition at FDR 0.05 irrespective of fold change as our differentially expressed genes, perform the Gene Ontology and Pathway Enrichment Analysis.
+a) Find out number of genes that are changed because of batch as opposed to because of Group.
+
+10.  Using the genes that are changed because of condition at FDR 0.05 irrespective of fold change as our differentially expressed genes, perform the Gene Ontology and Pathway Enrichment Analysis.
 
 ```{r, echo=T}
 
