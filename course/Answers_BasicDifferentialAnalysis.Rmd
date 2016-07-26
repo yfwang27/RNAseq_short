@@ -16,11 +16,8 @@ In this exercise, we will read in a count data from erythroblast differentiation
 
 
 
-1. 
-
-   a) First read in the sample informattion and count data.
-
-   b) Identify how many factors this experiment involves.
+1. Read in the sample informattion and count data.
+   Identify how many factors this experiment involves.
 
 ```{r,collapse=T,warning=FALSE}
 
@@ -34,6 +31,14 @@ targets <- read.table("Exercise_ShortRNAseq_sample.info",sep="\t",header=TRUE)
 
 targets
 
+# load the count information.
+
+AllCounts<-read.csv(file="Exercise_ShortRNAseq_counts.csv",header=T,row.names=1)
+
+# see the what is in the counts.csv
+
+head(AllCounts)
+
 ```
 
 In this experiment, we have two factors, namely, condition and batch. (ps: we introduced the 'mock' batch factor for this exercise. In the original publication, the batch effect was not discussed).
@@ -46,14 +51,6 @@ For the batch factor, we have 3 levels, namely a, b and c.
 
 ```{r,collapse=T,warning=FALSE}
 
-# load the count information that we generated for this exercise by using Rsubread, featurecount function.
-
-AllCounts<-read.csv(file="Exercise_ShortRNAseq_counts.csv",header=T,row.names=1)
-
-# see the what is in the counts.csv
-
-head(AllCounts)
-
 # We provide entrez_id as identifier for this exercise
 
 cData<-data.frame(name=targets$sample,condition=targets$condition,batch=targets$batch)
@@ -61,9 +58,6 @@ cData<-data.frame(name=targets$sample,condition=targets$condition,batch=targets$
 dds<-DESeqDataSetFromMatrix(countData= AllCounts,colData=cData,design=~batch+condition)
 
 ```
-
-
-Now you have the count table as deseqdataset, you can start to perform the DE analysis.
 
 3. a) Find the number of genes that are changed in knockdown samples versus control, i.e. KOa vs FFa and KOb vs FFa, at FDR 0.05 irrespective of fold change.
 
@@ -91,6 +85,17 @@ DE_res2<- DE_res2[DE_res2$padj<0.05 & abs(DE_res2$log2FoldChange)>1,]
 
 
 ```
+
+4. Using Biomart, add extra columns to the results dataframe such as gene name, gene biotype, gene description etc. 
+
+```{r, echo=T,warnings=F,collapse=T}
+
+
+
+
+
+```
+
 
 
 

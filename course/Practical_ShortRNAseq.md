@@ -43,16 +43,14 @@ Contents
 Analysis Considerations
 ========================================================
 
-
-
-
-```r
-- Single end or paired end sequencing experiment?
+- Single end or Paired end sequencing experiment?
 - Strand specific or non stand specific
 - How many factors involved in experiment (genotype, treatment, time course etc.)
-- What genome is involved
+- What genome is involved?
 - Is it a well annotated organism or a poorly annotated one. 
-```
+
+
+
 
 Set working directory
 ========================================================
@@ -325,7 +323,7 @@ head(dispersions(dds))
 plotDispEsts(dds)
 ```
 
-![plot of chunk unnamed-chunk-13](Practical_ShortRNAseq-figure/unnamed-chunk-13-1.png)
+![plot of chunk unnamed-chunk-12](Practical_ShortRNAseq-figure/unnamed-chunk-12-1.png)
 
 DESeq function - nbinomWaldTest()
 ========================================================
@@ -596,7 +594,7 @@ Principal component analysis of the samples
 plotPCA(rld, intgroup="Group")
 ```
 
-![plot of chunk unnamed-chunk-24](Practical_ShortRNAseq-figure/unnamed-chunk-24-1.png)
+![plot of chunk unnamed-chunk-23](Practical_ShortRNAseq-figure/unnamed-chunk-23-1.png)
 
 ```r
 # save the plot
@@ -605,7 +603,7 @@ library(ggplot2)
 ggsave(file="PCA_plot_version1.png")
 ```
 
-Principal component plot of the samples 
+Principal component analysis of the samples 
 ========================================================
 
 
@@ -634,7 +632,7 @@ ggplot(data, aes(PC1, PC2,label=colData(dds)$name))+
   ylab(paste0("PC2: ",percentVar[2],"% variance"))
 ```
 
-![plot of chunk unnamed-chunk-26](Practical_ShortRNAseq-figure/unnamed-chunk-26-1.png)
+![plot of chunk unnamed-chunk-25](Practical_ShortRNAseq-figure/unnamed-chunk-25-1.png)
 
 ```r
 ggsave(file="PCA_plot_version2.png")
@@ -687,7 +685,7 @@ The  function **plotMA()** shows  the  log2  fold  changes  attributable  to  a 
 plotMA(res, main="DESeq2", ylim=c(-4,4))
 ```
 
-![plot of chunk unnamed-chunk-29](Practical_ShortRNAseq-figure/unnamed-chunk-29-1.png)
+![plot of chunk unnamed-chunk-28](Practical_ShortRNAseq-figure/unnamed-chunk-28-1.png)
 
 Plot counts
 ========================================================
@@ -698,7 +696,7 @@ Plot counts
 plotCounts(dds,gene=which.min(res$padj),                                                                                                 intgroup="Group")
 ```
 
-![plot of chunk unnamed-chunk-30](Practical_ShortRNAseq-figure/unnamed-chunk-30-1.png)
+![plot of chunk unnamed-chunk-29](Practical_ShortRNAseq-figure/unnamed-chunk-29-1.png)
 
 
 Heatmap of the count matrix
@@ -1083,7 +1081,7 @@ ENSMUSG00000033793       0    1907.0 0.12904384
    plotPWF(pwf)
 ```
 
-![plot of chunk unnamed-chunk-45](Practical_ShortRNAseq-figure/unnamed-chunk-45-1.png)
+![plot of chunk unnamed-chunk-44](Practical_ShortRNAseq-figure/unnamed-chunk-44-1.png)
 
 ========================================================
 
@@ -1213,23 +1211,23 @@ loaded via a namespace (and not attached):
 [13] zlibbioc_1.18.0         GenomicFeatures_1.24.4 
 [15] data.table_1.9.6        annotate_1.50.0        
 [17] rpart_4.1-10            Matrix_1.2-6           
-[19] splines_3.3.0           BiocParallel_1.6.2     
-[21] geneplotter_1.50.0      stringr_1.0.0          
-[23] foreign_0.8-66          RCurl_1.95-4.8         
-[25] munsell_0.4.3           rtracklayer_1.32.1     
-[27] mgcv_1.8-12             nnet_7.3-12            
-[29] gridExtra_2.2.1         codetools_0.2-14       
-[31] Hmisc_3.17-4            XML_3.98-1.4           
-[33] GenomicAlignments_1.8.4 bitops_1.0-6           
-[35] grid_3.3.0              nlme_3.1-128           
-[37] xtable_1.8-2            gtable_0.2.0           
-[39] DBI_0.4-1               magrittr_1.5           
-[41] formatR_1.4             scales_0.4.0           
-[43] stringi_1.1.1           XVector_0.12.0         
-[45] genefilter_1.54.2       latticeExtra_0.6-28    
-[47] Formula_1.2-1           tools_3.3.0            
-[49] survival_2.39-5         colorspace_1.2-6       
-[51] cluster_2.0.4          
+[19] labeling_0.3            splines_3.3.0          
+[21] BiocParallel_1.6.2      geneplotter_1.50.0     
+[23] stringr_1.0.0           foreign_0.8-66         
+[25] RCurl_1.95-4.8          munsell_0.4.3          
+[27] rtracklayer_1.32.1      mgcv_1.8-12            
+[29] nnet_7.3-12             gridExtra_2.2.1        
+[31] codetools_0.2-14        Hmisc_3.17-4           
+[33] XML_3.98-1.4            GenomicAlignments_1.8.4
+[35] bitops_1.0-6            grid_3.3.0             
+[37] nlme_3.1-128            xtable_1.8-2           
+[39] gtable_0.2.0            DBI_0.4-1              
+[41] magrittr_1.5            formatR_1.4            
+[43] scales_0.4.0            stringi_1.1.1          
+[45] XVector_0.12.0          genefilter_1.54.2      
+[47] latticeExtra_0.6-28     Formula_1.2-1          
+[49] tools_3.3.0             survival_2.39-5        
+[51] colorspace_1.2-6        cluster_2.0.4          
 ```
 
 

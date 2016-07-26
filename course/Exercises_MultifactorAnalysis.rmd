@@ -6,17 +6,21 @@ output: html_document
 Website: http://bioinformatics.csc.mrc.ac.uk/training.html
 ---
 
-1.  Using likelihood ratio test instead of the wald test,
+1.  Perform differential expression analysis incorporating batch as additional factor. 
 
-a) Find the number of genes that are changed because of condition at FDR 0.05 irrespective of fold change.
+a) Find the number of genes that are changed because of condition at FDR 0.05.
 
-b) Find the number of genes that are changed because of batch at FDR 0.05 irrespective of fold change.
+b) Find the number of genes that are changed because of batch at FDR 0.05.
+
+
+2. Repeat above analysis sing likelihood ratio test instead of the wald test,
+
+a) Find the number of genes that are changed because of condition at FDR 0.05.
+
+b) Find the number of genes that are changed because of batch at FDR 0.05.
 
 
 
-2. Perform multi factor analysis by adding batch as factor to design.
-
-a) Find out number of genes that are changed because of batch as opposed to because of Group.
 
 
 
