@@ -1,0 +1,21 @@
+---
+title: "Visualization"
+author: "MRC CSC Bioinformatics Core"
+date: "08 August 2016"
+output: html_document
+Website: http://bioinformatics.csc.mrc.ac.uk/training.html
+---
+
+1. a) Perform the Principal Component Analysis using rlog method and find out % significance values of first two principal components .
+
+
+ b) Repeat the PCA, this time using VST method and compare the plots with the ones obtained using rlog method.
+ 
+2. Perform sample clustering and compare it with the clusters obtained using PCA.
+
+3. Draw MA plot and highlight all significant genes with adjusted p value less than 0.05.  
+
+4. Draw a heatmap based on top 40 differentially expressed genes.
+
+5. a) Use function plotCounts() to plot the counts for gene ENSMUSG00000024526. (b) Plot the unnormalized counts.
+

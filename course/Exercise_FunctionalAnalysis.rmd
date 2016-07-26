@@ -1,0 +1,18 @@
+---
+title: "Functional Analysis"
+author: "MRC CSC Bioinformatics Core"
+date: "08 August 2016"
+output: html_document
+Website: http://bioinformatics.csc.mrc.ac.uk/training.html
+---
+
+
+1.  Using the genes that are changed because of condition at FDR 0.05 irrespective of fold change as our differentially expressed genes, perform the Gene Ontology and Pathway Enrichment Analysis.
+
+
+
+2. Change the Keggpath id to name in the goseq output
+
+
+
+
