@@ -418,8 +418,8 @@ Add Gene symbol (Continued)
 
 ```r
 # merge the Gene_symbol to our DE dataset
-Allinfo <- merge(as.data.frame(resOrdered),bm,by.x=0,by.y=1)
-head(Allinfo)
+resAnnotated <- merge(as.data.frame(resOrdered),bm,by.x=0,by.y=1)
+head(resAnnotated)
 ```
 
 ```
@@ -441,7 +441,7 @@ head(Allinfo)
 
 ```r
 # change the column name
-colnames(Allinfo)[1]<-"ensembl_gene_id"
+colnames(resAnnotated)[1]<-"ensembl_gene_id"
 ```
 Add Gene symbol (Continued)
 ========================================================
@@ -449,10 +449,10 @@ Add Gene symbol (Continued)
 
 ```r
 # Order results by adjusted p value
-Allinfo<-Allinfo[order(Allinfo$pvalue,                                                                                                   decreasing=F),]
+resAnnotated<-resAnnotated[order(resAnnotated$pvalue,                                                                                                   decreasing=F),]
 
 # show the result with gene symbol annotation
-head(Allinfo)
+head(resAnnotated)
 ```
 
 ```
@@ -479,9 +479,10 @@ Save the result in ".txt" or ".csv" format
 
 
 ```r
-write.table(Allinfo,file="DESeq_result.txt",                                                                                                  sep="\t")
-write.csv(Allinfo,file="DESeq_result.csv",                                                                                                    row.names=F)
+write.table(resAnnotated,file="DESeq_result.txt",                                                                                                  sep="\t")
+write.csv(resAnnotated,file="DESeq_result.csv",                                                                                                    row.names=F)
 ```
+
 Exploring results
 ========================================================
 
@@ -512,30 +513,6 @@ sum(res$padj < 0.05, na.rm=TRUE)
 [1] 1970
 ```
 
-Using Contrast
-========================================================
-
-
-```r
-    res_contrast<-results(dds,contrast=c("Group","Hfd","Viv")) 
-
-    
-    summary(res_contrast)
-```
-
-```
-
-out of 22605 with nonzero total read count
-adjusted p-value < 0.1
-LFC > 0 (up)     : 1467, 6.5% 
-LFC < 0 (down)   : 989, 4.4% 
-outliers [1]     : 18, 0.08% 
-low counts [2]   : 5493, 24% 
-(mean count < 3)
-[1] see 'cooksCutoff' argument of ?results
-[2] see 'independentFiltering' argument of ?results
-```
-
 
 MA plot
 ========================================================
@@ -546,7 +523,7 @@ The  function **plotMA()** shows  the  log2  fold  changes  attributable  to  a 
 plotMA(res, main="DESeq2", ylim=c(-4,4))
 ```
 
-![plot of chunk unnamed-chunk-22](Practical_ShortRNAseq-figure/unnamed-chunk-22-1.png)
+![plot of chunk unnamed-chunk-21](Practical_ShortRNAseq-figure/unnamed-chunk-21-1.png)
 
 Plot counts
 ========================================================
@@ -557,7 +534,7 @@ Plot counts
 plotCounts(dds,gene=which.min(res$padj),                                                                                                 intgroup="Group")
 ```
 
-![plot of chunk unnamed-chunk-23](Practical_ShortRNAseq-figure/unnamed-chunk-23-1.png)
+![plot of chunk unnamed-chunk-22](Practical_ShortRNAseq-figure/unnamed-chunk-22-1.png)
 
 
 Exercises
@@ -571,11 +548,14 @@ Solutions
 * [RNAseq Solutions](http://mrccsc.github.io/RNAseq_short/course/Answers_BasicDifferentialAnalysis.html)
 
 
-Visualization of results
+Transformation of count data
 ========================================================
 id: explore
 
-Transformation of count data
+In order to test for differential expression, we operate on raw counts. However for other downstream analyses { e.g. for visualization or clustering } it is useful to work with transformed versions of the count data.
+
+The regularized logarithm or rlog incorporates a prior 
+on the sample differences, and the other uses the concept of variance stabilizing transformations.
 
 The function **rlog** (regularized log), transforms the original count data to the log2 scale.
 
@@ -603,66 +583,10 @@ Data quality assessment and quality control  are essential steps
 of any data analysis. These steps should typically be performed very early in the analysis of a new data set,
 preceding or in parallel to the differential expression testing.
 
-
-Principal component plot of the samples
+Heatmap of the count matrix
 ========================================================
 
-**PCA plot** is useful to spot individual sample outliers. 
-
-
-```r
-plotPCA(rld, intgroup="Group")
-```
-
-![plot of chunk unnamed-chunk-25](Practical_ShortRNAseq-figure/unnamed-chunk-25-1.png)
-
-```r
-# save the plot
-
-library(ggplot2)
-ggsave(file="PCA_plot_version1.png")
-```
-
-Principal component analysis of the samples 
-========================================================
-
-
-```r
-library(RColorBrewer)
-
-# Creates nice looking color palettes
-showcols <- brewer.pal(8, "Set1")[1:length(unique(colData(dds)$Group))]
-
-data <- plotPCA(rld, intgroup="Group", returnData=TRUE)
-percentVar <- round(100 * attr(data, "percentVar"))
-```
-
-  attr function gets the named attribute of an object.
-  Here, gets the percent variation from data object.
-
-
-PCA of the samples 
-========================================================
-
-
-```r
-ggplot(data, aes(PC1, PC2,label=colData(dds)$name))+
-  geom_text(col=showcols[colData(dds)$Group],                                                                                                alpha=0.8,size=4)+
-  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
-  ylab(paste0("PC2: ",percentVar[2],"% variance"))
-```
-
-![plot of chunk unnamed-chunk-27](Practical_ShortRNAseq-figure/unnamed-chunk-27-1.png)
-
-```r
-ggsave(file="PCA_plot_version2.png")
-```
-
-Heatmap of sample to sample distances
-========================================================
-
-Another use of the transformed data is sample clustering. Here, we apply the dist function to the transpose
-of the transformed count matrix to get sample-to-sample distances. 
+To explore a counts matrix, it is often useful to look it as heatmap.
 
 The assay function is used to extract the matrix of normalized values
 
@@ -670,41 +594,7 @@ The assay function is used to extract the matrix of normalized values
 ```r
 rlogcount <- assay(rld)      
 rlogcount <- rlogcount[!rowSums(rlogcount) == 0,]
-sampleDists <- as.matrix(dist(t(rlogcount)))
-```
 
-========================================================
-
- Save the plot as png file
-
-
-```r
-png(file="sample_dis_map.png")
-  heatmap.2(as.matrix(sampleDists), key=F, trace="none",
-    col=colorpanel(100, "black", "white"),
-    ColSideColors=showcols[colData(dds)$Group], 
-    RowSideColors=showcols[colData(dds)$Group],
-    margin=c(10, 10), main="Sample Distance Matrix")
-dev.off()
-```
-
-
-=======================================================
-
-<div align="center">
-<img src="sample_dis_map.png" alt="gene" height="900" width="900">
-</div>
-
-
-
-
-Heatmap of the count matrix
-========================================================
-
-To explore a counts matrix, it is often useful to look it as heatmap.
-
-
-```r
 # generate DE gene list
   DEgenes4heatmap<-res[res$padj<0.05 & !is.na(res$padj),]
 # show the number of DE genes
@@ -794,6 +684,98 @@ dev.off()
 <img src="heatmap2.png" alt="gene" height="900" width="900">
 </div>
 
+
+
+Heatmap of sample to sample distances
+========================================================
+
+Another use of the transformed data is sample clustering. Here, we apply the dist function to the transpose
+of the transformed count matrix to get sample-to-sample distances. 
+
+
+
+```r
+sampleDists <- as.matrix(dist(t(rlogcount)))
+```
+
+========================================================
+
+ Save the plot as png file
+
+
+```r
+png(file="sample_dis_map.png")
+  heatmap.2(as.matrix(sampleDists), key=F, trace="none",
+    col=colorpanel(100, "black", "white"),
+    ColSideColors=showcols[colData(dds)$Group], 
+    RowSideColors=showcols[colData(dds)$Group],
+    margin=c(10, 10), main="Sample Distance Matrix")
+dev.off()
+```
+
+
+=======================================================
+
+<div align="center">
+<img src="sample_dis_map.png" alt="gene" height="900" width="900">
+</div>
+
+
+Principal component plot of the samples
+========================================================
+
+**PCA plot** is useful to spot individual sample outliers. 
+
+
+```r
+plotPCA(rld, intgroup="Group")
+```
+
+![plot of chunk unnamed-chunk-30](Practical_ShortRNAseq-figure/unnamed-chunk-30-1.png)
+
+```r
+# save the plot
+
+library(ggplot2)
+ggsave(file="PCA_plot_version1.png")
+```
+
+Principal component analysis of the samples 
+========================================================
+
+
+```r
+library(RColorBrewer)
+
+# Creates nice looking color palettes
+showcols <- brewer.pal(8, "Set1")[1:length(unique(colData(dds)$Group))]
+
+data <- plotPCA(rld, intgroup="Group", returnData=TRUE)
+percentVar <- round(100 * attr(data, "percentVar"))
+```
+
+  attr function gets the named attribute of an object.
+  Here, gets the percent variation from data object.
+
+
+PCA of the samples 
+========================================================
+
+
+```r
+ggplot(data, aes(PC1, PC2,label=colData(dds)$name))+
+  geom_text(col=showcols[colData(dds)$Group],                                                                                                alpha=0.8,size=4)+
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance"))
+```
+
+![plot of chunk unnamed-chunk-32](Practical_ShortRNAseq-figure/unnamed-chunk-32-1.png)
+
+```r
+ggsave(file="PCA_plot_version2.png")
+```
+
+
 Exercises
 =========================================================
 
@@ -805,7 +787,58 @@ Solutions
 * [RNAseq Solutions](http://mrccsc.github.io/RNAseq_short/course/Answers_Visualization.html)
 
 
+Variations to standard workflow
+========================================================
 
+Using Contrasts
+
+Contrasts enable the user to generate results for all  possible
+comparisons: 
+
+Imagine an experimental design containing a factor with three levels, say A, B and C.
+We can use contrasts to compare B vs A, of C vs A, and C vs B.
+
+
+```r
+    res_contrast<-results(dds,contrast=c("Group","Hfd","Viv")) 
+
+    
+    summary(res_contrast)
+```
+
+```
+
+out of 22605 with nonzero total read count
+adjusted p-value < 0.1
+LFC > 0 (up)     : 1467, 6.5% 
+LFC < 0 (down)   : 989, 4.4% 
+outliers [1]     : 18, 0.08% 
+low counts [2]   : 5493, 24% 
+(mean count < 3)
+[1] see 'cooksCutoff' argument of ?results
+[2] see 'independentFiltering' argument of ?results
+```
+
+
+Interactions
+========================================================
+
+Interaction terms can be added to the design formula, in order to test, for example, if the log2 fold change
+attributable to a given condition is different based on another factor, for example if the condition effect differs across genotype.
+
+A simple approach to study interaction is to perform the following steps:
+1. combine the factors of interest into a single factor with all combinations of the original factors
+2. change the design to include just this factor, e.g.  group
+
+
+
+```r
+dds$group <- factor(paste0(dds$genotype, dds$condition))
+design(dds) <- ~ group
+dds <- DESeq(dds)
+resultsNames(dds)
+results(dds, contrast=c("group", "IB", "IA"))
+```
 
 
 Multi factor designs
@@ -1080,7 +1113,7 @@ ENSMUSG00000033793       0    1907.0 0.12904384
    plotPWF(pwf)
 ```
 
-![plot of chunk unnamed-chunk-44](Practical_ShortRNAseq-figure/unnamed-chunk-44-1.png)
+![plot of chunk unnamed-chunk-45](Practical_ShortRNAseq-figure/unnamed-chunk-45-1.png)
 
 ========================================================
 
@@ -1185,7 +1218,7 @@ locale:
 [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
 
 attached base packages:
-[1] parallel  stats4    stats     graphics  grDevices utils     datasets 
+[1] stats4    parallel  stats     graphics  grDevices utils     datasets 
 [8] methods   base     
 
 other attached packages:
@@ -1210,23 +1243,23 @@ loaded via a namespace (and not attached):
 [13] zlibbioc_1.18.0         GenomicFeatures_1.24.4 
 [15] data.table_1.9.6        annotate_1.50.0        
 [17] rpart_4.1-10            Matrix_1.2-6           
-[19] labeling_0.3            splines_3.3.0          
-[21] BiocParallel_1.6.2      geneplotter_1.50.0     
-[23] stringr_1.0.0           foreign_0.8-66         
-[25] RCurl_1.95-4.8          munsell_0.4.3          
-[27] rtracklayer_1.32.1      mgcv_1.8-12            
-[29] nnet_7.3-12             gridExtra_2.2.1        
-[31] codetools_0.2-14        Hmisc_3.17-4           
-[33] XML_3.98-1.4            GenomicAlignments_1.8.4
-[35] bitops_1.0-6            grid_3.3.0             
-[37] nlme_3.1-128            xtable_1.8-2           
-[39] gtable_0.2.0            DBI_0.4-1              
-[41] magrittr_1.5            formatR_1.4            
-[43] scales_0.4.0            stringi_1.1.1          
-[45] XVector_0.12.0          genefilter_1.54.2      
-[47] latticeExtra_0.6-28     Formula_1.2-1          
-[49] tools_3.3.0             survival_2.39-5        
-[51] colorspace_1.2-6        cluster_2.0.4          
+[19] splines_3.3.0           BiocParallel_1.6.2     
+[21] geneplotter_1.50.0      stringr_1.0.0          
+[23] foreign_0.8-66          RCurl_1.95-4.8         
+[25] munsell_0.4.3           rtracklayer_1.32.1     
+[27] mgcv_1.8-12             nnet_7.3-12            
+[29] gridExtra_2.2.1         codetools_0.2-14       
+[31] Hmisc_3.17-4            XML_3.98-1.4           
+[33] GenomicAlignments_1.8.4 bitops_1.0-6           
+[35] grid_3.3.0              nlme_3.1-128           
+[37] xtable_1.8-2            gtable_0.2.0           
+[39] DBI_0.4-1               magrittr_1.5           
+[41] formatR_1.4             scales_0.4.0           
+[43] stringi_1.1.1           XVector_0.12.0         
+[45] genefilter_1.54.2       latticeExtra_0.6-28    
+[47] Formula_1.2-1           tools_3.3.0            
+[49] survival_2.39-5         colorspace_1.2-6       
+[51] cluster_2.0.4          
 ```
 
 
