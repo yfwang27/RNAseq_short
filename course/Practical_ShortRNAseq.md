@@ -50,8 +50,6 @@ Analysis Considerations
 - Is it a well annotated organism or a poorly annotated one. 
 
 
-
-
 Set working directory
 ========================================================
 
@@ -77,7 +75,7 @@ Quality Assessment
 ========================================================
 id: quality
 
-Quality assessment can be performed at various levels such as raw reads, aligned data.
+Quality assessment can be performed at various levels such as raw reads, aligned data, count data
 
 Basic checks on the raw data include checking sequence quality, GC content, adaptor contamination,
 duplication levels etc. 
@@ -144,7 +142,7 @@ AllCounts.csv
 
 
 
-Read sample data
+Read sample information
 ========================================================
 id: de
 
@@ -221,35 +219,25 @@ Prepare deseqdataset object
 cData<-data.frame(name=targets$Sample,                                                                          Group=targets$Group,Batch=targets$Batch)
 
 rownames(cData)<-cData[,1]
-
-cData$Group
 ```
 
-```
-[1] Viv Viv Viv Hfd Hfd Hfd
-Levels: Hfd Viv
-```
+Factor levels
+
+By default, R will choose a reference level for factors based on alphabetical order. 
+The comparisons will be based on the alphabetical order of the levels. We can either explicitly tell results which comparison to make using the contrast argument (this will be shown later), or
+we can explicitly set the factors levels.
+
+Setting the factor levels 
+
+cData$Group <- factor(cData$Group, levels=c("Viv","Hfd"))
+
+...or using relevel, just specifying the reference level:
+
 
 ```r
 cData$Group<-relevel(cData$Group,ref="Viv")
 ```
 
-========================================================
-
-
-```r
- cData
-```
-
-```
-     name Group Batch
-Viv1 Viv1   Viv     a
-Viv2 Viv2   Viv     b
-Viv3 Viv3   Viv     c
-Hfd1 Hfd1   Hfd     a
-Hfd2 Hfd2   Hfd     b
-Hfd3 Hfd3   Hfd     c
-```
 
 Prepare deseqdataset object (Continued)
 ========================================================
@@ -278,6 +266,8 @@ which performs normalization, fitting to the model and statistical testing.
 
 ```r
 dds<-DESeq(dds)
+
+?DESeq
 ```
 
 DESeq function - estimateSizeFactors()
@@ -357,6 +347,8 @@ res<-results(dds)
 
 # Order results by adjusted p value 
 resOrdered<-res[order(res$padj),]
+
+?results      
 ```
 
 Getting results
@@ -527,7 +519,6 @@ Using Contrast
 ```r
     res_contrast<-results(dds,contrast=c("Group","Hfd","Viv")) 
 
- # the result should same as "res"
     
     summary(res_contrast)
 ```
@@ -544,6 +535,29 @@ low counts [2]   : 5493, 24%
 [1] see 'cooksCutoff' argument of ?results
 [2] see 'independentFiltering' argument of ?results
 ```
+
+
+MA plot
+========================================================
+The  function **plotMA()** shows  the  log2  fold  changes  attributable  to  a  given  variable  over  the  mean of normalized counts.  Points will be colored red if the adjusted p value is less than 0.1.  Points which fall out of the window are plotted as open triangles pointing either up or down.
+
+
+```r
+plotMA(res, main="DESeq2", ylim=c(-4,4))
+```
+
+![plot of chunk unnamed-chunk-22](Practical_ShortRNAseq-figure/unnamed-chunk-22-1.png)
+
+Plot counts
+========================================================
+ **Plot of normalized counts for a single gene on log scale**
+
+
+```r
+plotCounts(dds,gene=which.min(res$padj),                                                                                                 intgroup="Group")
+```
+
+![plot of chunk unnamed-chunk-23](Practical_ShortRNAseq-figure/unnamed-chunk-23-1.png)
 
 
 Exercises
@@ -583,8 +597,14 @@ Transformation of count data
 </div>
 
 
+Data quality assessment by sample clustering and visualization
+========================================================
+Data quality assessment and quality control  are essential steps
+of any data analysis. These steps should typically be performed very early in the analysis of a new data set,
+preceding or in parallel to the differential expression testing.
 
-Principal component analysis of the samples
+
+Principal component plot of the samples
 ========================================================
 
 **PCA plot** is useful to spot individual sample outliers. 
@@ -594,7 +614,7 @@ Principal component analysis of the samples
 plotPCA(rld, intgroup="Group")
 ```
 
-![plot of chunk unnamed-chunk-23](Practical_ShortRNAseq-figure/unnamed-chunk-23-1.png)
+![plot of chunk unnamed-chunk-25](Practical_ShortRNAseq-figure/unnamed-chunk-25-1.png)
 
 ```r
 # save the plot
@@ -632,7 +652,7 @@ ggplot(data, aes(PC1, PC2,label=colData(dds)$name))+
   ylab(paste0("PC2: ",percentVar[2],"% variance"))
 ```
 
-![plot of chunk unnamed-chunk-25](Practical_ShortRNAseq-figure/unnamed-chunk-25-1.png)
+![plot of chunk unnamed-chunk-27](Practical_ShortRNAseq-figure/unnamed-chunk-27-1.png)
 
 ```r
 ggsave(file="PCA_plot_version2.png")
@@ -676,27 +696,6 @@ dev.off()
 </div>
 
 
-MA plot
-========================================================
-The  function **plotMA()** shows  the  log2  fold  changes  attributable  to  a  given  variable  over  the  mean of normalized counts.  Points will be colored red if the adjusted p value is less than 0.1.  Points which fall out of the window are plotted as open triangles pointing either up or down.
-
-
-```r
-plotMA(res, main="DESeq2", ylim=c(-4,4))
-```
-
-![plot of chunk unnamed-chunk-28](Practical_ShortRNAseq-figure/unnamed-chunk-28-1.png)
-
-Plot counts
-========================================================
- **Plot of normalized counts for a single gene on log scale**
-
-
-```r
-plotCounts(dds,gene=which.min(res$padj),                                                                                                 intgroup="Group")
-```
-
-![plot of chunk unnamed-chunk-29](Practical_ShortRNAseq-figure/unnamed-chunk-29-1.png)
 
 
 Heatmap of the count matrix
@@ -1186,7 +1185,7 @@ locale:
 [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
 
 attached base packages:
-[1] stats4    parallel  stats     graphics  grDevices utils     datasets 
+[1] parallel  stats4    stats     graphics  grDevices utils     datasets 
 [8] methods   base     
 
 other attached packages:
