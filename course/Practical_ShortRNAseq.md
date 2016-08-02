@@ -24,11 +24,6 @@ RNA Sequencing (**RNA-seq**) is a well established technique which allows for st
 
 * Nature Reviews Genetics 10, 57-63 (January 2009)
 
-RNA-Seq Analysis Workflow 
-=======================================================
-<div align="center">
-<img src="flow2.jpeg" alt="gene" height="900" width="450">
-</div>
 
 Contents
 ====================================
@@ -43,11 +38,11 @@ Contents
 Analysis Considerations
 ========================================================
 
-- Single end or Paired end sequencing experiment?
-- Strand specific or non stand specific
-- How many factors involved in experiment (genotype, treatment, time course etc.)
-- What genome is involved?
-- Is it a well annotated organism or a poorly annotated one. 
+* Single end or Paired end sequencing experiment?
+* Strand specific or non stand specific
+* How many factors involved in experiment (genotype, treatment, time course etc.)
+* What genome is involved?
+* Is it a well annotated organism or a poorly annotated one. 
 
 
 Set working directory
@@ -60,12 +55,12 @@ You may navigate to the unarchived RNAseq_short/course folder in the Rstudio men
 
 or in the console.
 
-
-```r
 Use the getwd() to see where your current directory is
 
 Use setwd() to set up your directory in the console
 
+
+```r
 setwd("/PathToMyDownload/RNAseq_short/course")
 ```
 
@@ -182,9 +177,10 @@ AllCounts<-read.csv(file="AllCounts.csv",row.names = 1)
 Read count data (Continued)
 ========================================================
 
-```r
-# Show first few rows of "AllCounts" object
+ Show first few rows of "AllCounts" object and the class of AllCounts object
 
+
+```r
 head(AllCounts)
 ```
 
@@ -199,8 +195,6 @@ ENSMUSG00000089420    0    0    0    0    0    0
 ```
 
 ```r
-# Show the class of AllCounts object
-
 class(AllCounts)
 ```
 
@@ -1218,7 +1212,7 @@ locale:
 [1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
 
 attached base packages:
-[1] stats4    parallel  stats     graphics  grDevices utils     datasets 
+[1] parallel  stats4    stats     graphics  grDevices utils     datasets 
 [8] methods   base     
 
 other attached packages:
@@ -1243,23 +1237,23 @@ loaded via a namespace (and not attached):
 [13] zlibbioc_1.18.0         GenomicFeatures_1.24.4 
 [15] data.table_1.9.6        annotate_1.50.0        
 [17] rpart_4.1-10            Matrix_1.2-6           
-[19] splines_3.3.0           BiocParallel_1.6.2     
-[21] geneplotter_1.50.0      stringr_1.0.0          
-[23] foreign_0.8-66          RCurl_1.95-4.8         
-[25] munsell_0.4.3           rtracklayer_1.32.1     
-[27] mgcv_1.8-12             nnet_7.3-12            
-[29] gridExtra_2.2.1         codetools_0.2-14       
-[31] Hmisc_3.17-4            XML_3.98-1.4           
-[33] GenomicAlignments_1.8.4 bitops_1.0-6           
-[35] grid_3.3.0              nlme_3.1-128           
-[37] xtable_1.8-2            gtable_0.2.0           
-[39] DBI_0.4-1               magrittr_1.5           
-[41] formatR_1.4             scales_0.4.0           
-[43] stringi_1.1.1           XVector_0.12.0         
-[45] genefilter_1.54.2       latticeExtra_0.6-28    
-[47] Formula_1.2-1           tools_3.3.0            
-[49] survival_2.39-5         colorspace_1.2-6       
-[51] cluster_2.0.4          
+[19] labeling_0.3            splines_3.3.0          
+[21] BiocParallel_1.6.2      geneplotter_1.50.0     
+[23] stringr_1.0.0           foreign_0.8-66         
+[25] RCurl_1.95-4.8          munsell_0.4.3          
+[27] rtracklayer_1.32.1      mgcv_1.8-12            
+[29] nnet_7.3-12             gridExtra_2.2.1        
+[31] codetools_0.2-14        Hmisc_3.17-4           
+[33] XML_3.98-1.4            GenomicAlignments_1.8.4
+[35] bitops_1.0-6            grid_3.3.0             
+[37] nlme_3.1-128            xtable_1.8-2           
+[39] gtable_0.2.0            DBI_0.4-1              
+[41] magrittr_1.5            formatR_1.4            
+[43] scales_0.4.0            stringi_1.1.1          
+[45] XVector_0.12.0          genefilter_1.54.2      
+[47] latticeExtra_0.6-28     Formula_1.2-1          
+[49] tools_3.3.0             survival_2.39-5        
+[51] colorspace_1.2-6        cluster_2.0.4          
 ```
 
 

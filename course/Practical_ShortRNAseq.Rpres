@@ -26,11 +26,6 @@ RNA Sequencing (**RNA-seq**) is a well established technique which allows for st
 
 * Nature Reviews Genetics 10, 57-63 (January 2009)
 
-RNA-Seq Analysis Workflow 
-=======================================================
-<div align="center">
-<img src="flow2.jpeg" alt="gene" height="900" width="450">
-</div>
 
 Contents
 ====================================
@@ -45,11 +40,11 @@ Contents
 Analysis Considerations
 ========================================================
 
-- Single end or Paired end sequencing experiment?
-- Strand specific or non stand specific
-- How many factors involved in experiment (genotype, treatment, time course etc.)
-- What genome is involved?
-- Is it a well annotated organism or a poorly annotated one. 
+* Single end or Paired end sequencing experiment?
+* Strand specific or non stand specific
+* How many factors involved in experiment (genotype, treatment, time course etc.)
+* What genome is involved?
+* Is it a well annotated organism or a poorly annotated one. 
 
 
 Set working directory
@@ -62,11 +57,12 @@ You may navigate to the unarchived RNAseq_short/course folder in the Rstudio men
 
 or in the console.
 
-```{r,eval=F} 
-
 Use the getwd() to see where your current directory is
 
 Use setwd() to set up your directory in the console
+
+```{r,eval=F} 
+
 
 setwd("/PathToMyDownload/RNAseq_short/course")
 
@@ -187,12 +183,14 @@ AllCounts<-read.csv(file="AllCounts.csv",row.names = 1)
 
 Read count data (Continued)
 ========================================================
+
+ Show first few rows of "AllCounts" object and the class of AllCounts object
+
 ```{r,eval=TRUE,echo=TRUE}
-# Show first few rows of "AllCounts" object
+
 
 head(AllCounts)
 
-# Show the class of AllCounts object
 
 class(AllCounts)
 ```
