@@ -1551,7 +1551,8 @@ sampleDists &lt;- as.matrix(dist(t(rlogcount)))
 <div class="slideContent noTitle" >
 <p>Save the plot as png file</p>
 
-<pre><code class="r">png(file=&quot;sample_dis_map.png&quot;)
+<pre><code class="r"> library(gplots)
+png(file=&quot;sample_dis_map.png&quot;)
   heatmap.2(as.matrix(sampleDists), key=F, trace=&quot;none&quot;,
     col=colorpanel(100, &quot;black&quot;, &quot;white&quot;),
     ColSideColors=showcols[colData(dds)$Group], 
@@ -1911,7 +1912,7 @@ results(dds, contrast=c(&quot;newgroup&quot;, &quot;Viva&quot;, &quot;Hfda&quot;
 <h3>Exercises</h3>
 <div class="slideContent" >
 <ul>
-<li><a href="http://mrccsc.github.io/RNAseq_short/course/Exercise_MultifactorAnalysis.html">RNAseq Exercises</a></li>
+<li><a href="http://mrccsc.github.io/RNAseq_short/course/Exercises_MultifactorAnalysis.html">RNAseq Exercises</a></li>
 </ul>
 
 </div>
