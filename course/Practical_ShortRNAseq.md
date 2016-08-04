@@ -678,6 +678,7 @@ sampleDists <- as.matrix(dist(t(rlogcount)))
 
 
 ```r
+ library(gplots)
 png(file="sample_dis_map.png")
   heatmap.2(as.matrix(sampleDists), key=F, trace="none",
     col=colorpanel(100, "black", "white"),
