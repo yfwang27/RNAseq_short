@@ -6,7 +6,46 @@ output: html_document
 Website: http://bioinformatics.csc.mrc.ac.uk/training.html
 ---
 
-1.  Using likelihood ratio test instead of the wald test,
+1. Use contrasts to specify the comparison you wish to make. Run comparisons between KOa vs FFa and KOb vs FFa. 
+
+2. Perform multi factor analysis by adding batch as factor to design.
+
+3. Repeat above analysis using likelihood ratio test instead of the wald test,
+
+a) Find the number of genes that are changed because of condition at FDR 0.05.
+
+
+```{r, echo=T,warnings=F,collapse=T,eval=FALSE}
+
+# LRT analysis for the batch effect
+
+
+ddsLRT_batch <- DESeq(ddsLRT, test="LRT", full=~batch+condition, reduced=~condition)
+
+resddsLRT_batch<-results(ddsLRT_batch)
+
+summary(resddsLRT_batch,alpha=0.05)
+
+```
+
+b) Find the number of genes that are changed because of batch at FDR 0.05.
+
+```{r, echo=T,warnings=F,collapse=T,eval=FALSE}
+
+# LRT analysis for the batch effect
+
+
+ddsLRT_batch <- DESeq(ddsLRT, test="LRT", full=~batch+condition, reduced=~condition)
+
+resddsLRT_batch<-results(ddsLRT_batch)
+
+summary(resddsLRT_batch,alpha=0.05)
+
+```
+
+
+
+3.  Using likelihood ratio test instead of the wald test,
 
 a) Find the number of genes that are changed because of condition at FDR 0.05 irrespective of fold change.
 
@@ -28,21 +67,6 @@ resLRTorder<-resddsLRT_con[order(resddsLRT_con$padj),]
 ```
 
 
-2. Perform multi factor analysis by adding batch as factor to design.
 
-a) Find out number of genes that are changed because of batch as opposed to because of Group.
-
-```{r, echo=T,warnings=F,collapse=T,eval=FALSE}
-
-# LRT analysis for the batch effect
-
-
-ddsLRT_batch <- DESeq(ddsLRT, test="LRT", full=~batch+condition, reduced=~condition)
-
-resddsLRT_batch<-results(ddsLRT_batch)
-
-summary(resddsLRT_batch,alpha=0.05)
-
-```
 
 

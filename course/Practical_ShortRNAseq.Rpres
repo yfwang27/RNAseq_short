@@ -55,9 +55,15 @@ You may navigate to the unarchived RNAseq_short/course folder in the Rstudio men
 
 **Session -> Set Working Directory -> Choose Directory**
 
-or in the console.
+or in the console, 
 
 Use the getwd() to see where your current directory is
+
+```{r,eval=F} 
+
+getwd()
+
+```
 
 Use setwd() to set up your directory in the console
 
@@ -68,22 +74,22 @@ setwd("/PathToMyDownload/RNAseq_short/course")
 
 ```
 
-**setwd("~/Downloads/RNAseq_short/course")**
+
 
 Quality Assessment
 ========================================================
 id: quality
 
-Quality assessment can be performed at various levels such as raw reads, aligned data, count data
+Quality assessment can be performed at various levels such as raw reads, aligned data, count data.
 
 Basic checks on the raw data include checking sequence quality, GC content, adaptor contamination,
 duplication levels etc. 
 
-Bioconductor packages such as Rsubreads, EDAseq provides functions to retrieve and visualize 
+Bioconductor packages such as Rsubreads, EDAseq, ShortRead provides functions to retrieve and visualize 
 various quality metrics.
 
 
-Detailed information can be found [here](https://github.com/sanjaykhadayate/rnacourse/blob/master/practical.md).
+Detailed information can be found [here](https://mrccsc.github.io/Alignment/course/Alignment.html#/13).
 
 
 
@@ -97,11 +103,11 @@ First step in RNA-Seq data analysis is to align the raw reads to genome/transcri
 For RNASeq data alignment, aligner need to be able to align across the exon-exon junction.
 
 There are many tools that perform splice aware alignment of rnaseq data
-such as Tophat, Rsubreads etc.
+such as Tophat, Rsubreads etc. One can also use SpliceMap function from Rbowtie package.
 
 Output of this step is aligned data in [SAM/BAM format](http://mrccsc.github.io/genomicFormats.html#/11).  
 
- More information about [alignment](https://github.com/sanjaykhadayate/rnacourse/blob/master/practical.md).
+ More information about [alignment](https://mrccsc.github.io/Alignment/course/Alignment.html#/32).
 
 
 
@@ -117,8 +123,11 @@ Output of this step is a count table with reads assigned to individual features.
 This is usually called as raw counts and is input for many tools that perform the
 differential expression analysis. 
 
+For counting aligned reads in genes, the summarizeOverlaps function
+of GenomicAlignments with mode="Union" can be used, resulting in a RangedSummarizedExperiment
+object.
 
-More info about [Read counting](https://github.com/sanjaykhadayate/rnacourse/blob/master/practical.md).
+More info about [Read counting](https://mrccsc.github.io/Alignment/course/Alignment.html#/54).
 
 
 Material
@@ -161,11 +170,6 @@ Read in **targets.txt** file by using read.table function
 
 targets <- read.table("targets.txt",sep="\t",header=TRUE)  
 
-```
-
-========================================================
-```{r,eval=TRUE,echo=TRUE}
-
 targets
 
 ```
@@ -180,9 +184,6 @@ Load count data by using read.csv function
 AllCounts<-read.csv(file="AllCounts.csv",row.names = 1)
 
 ```
-
-Read count data (Continued)
-========================================================
 
  Show first few rows of "AllCounts" object and the class of AllCounts object
 
@@ -210,25 +211,6 @@ rownames(cData)<-cData[,1]
 
 ```
 
-Factor levels
-
-By default, R will choose a reference level for factors based on alphabetical order. 
-The comparisons will be based on the alphabetical order of the levels. We can either explicitly tell results which comparison to make using the contrast argument (this will be shown later), or
-we can explicitly set the factors levels.
-
-Setting the factor levels 
-
-cData$Group <- factor(cData$Group, levels=c("Viv","Hfd"))
-
-...or using relevel, just specifying the reference level:
-
-```{r,eval=TRUE,echo=TRUE} 
-
-
-cData$Group<-relevel(cData$Group,ref="Viv")
-
-
-```
 
 
 Prepare deseqdataset object (Continued)
@@ -264,9 +246,17 @@ dds<-DESeq(dds)
 
 ```
 
+The function DESeq runs the following functions in order,
+
+**estimateSizeFactors()**
+
+**estimateDispersions()**
+
+**nbinomWaldTest()**
+
+
 DESeq function - estimateSizeFactors()
 ========================================================
-The function DESeq runs the following functions in order.
 
 
 1 - **Estimation of size factors**
@@ -279,6 +269,13 @@ The sizeFactors vector assigns to each column of the count matrix a value, the s
 sizeFactors(dds)
 
 ```
+
+========================================================
+
+<div align="center">
+<img src="sizefactor.png" alt="gene" height="600" width="800">
+</div>
+
 
 DESeq function - estimateDispersions()
 ========================================================
@@ -300,18 +297,16 @@ DESeq function - nbinomWaldTest()
 ========================================================
 3- **Hypothesis test for differential expression**
 
-Finally, the function tests whether each model coefficient differs significantly from zero, using previously calculated sizeFactors and dispersion estimates.
 
-DESeq2 reports the standard error for each Log Fold Change estimate.  
-
-For significance testing, DESeq2 uses a Wald test: Log Fold Change is divided by its standard error, resulting in a z-statistic, which is compared to a standard normal distribution to generate p values.
+For significance testing, DESeq2 by default uses a Wald test, where
+the function tests whether each model coefficient differs significantly from zero, using previously calculated sizeFactors and dispersion estimates.
 
 The Wald test P values  are adjusted for multiple testing using the procedure of Benjamini and Hochberg.
 
 
-```{r,eval=TRUE,echo=TRUE}
+```{r,eval=FALSE,echo=TRUE}
 
-#  nbinomWaldTest()
+nbinomWaldTest()
 
 ```
 
@@ -322,16 +317,25 @@ Getting results
 ========================================================
 
 Results tables are generated using the function **results()**, which extracts a results table with log2 fold changes, p  values and adjusted p values.
+
+ Use the function "results()"
+
 ```{r,eval=TRUE,echo=TRUE}   
-# use the function "results()"
+
 res<-results(dds) 
 
-# Order results by adjusted p value 
+```
+
+ Order results by adjusted p value
+
+```{r,eval=TRUE,echo=TRUE}   
+
 resOrdered<-res[order(res$padj),]
 
 ?results      
       
 ```
+
 
 Getting results
 ========================================================
@@ -355,7 +359,7 @@ mart=useMart('ENSEMBL_MART_ENSEMBL',
 dataset='mmusculus_gene_ensembl',
 host="may2012.archive.ensembl.org")
 
-bm<-getBM(attributes=c('ensembl_gene_id',                                                                                         'mgi_symbol'),
+bm<-getBM(attributes=c('ensembl_gene_id','mgi_symbol'),
 filters ='ensembl_gene_id',
 values=rownames(resOrdered), mart=mart)
 
@@ -394,14 +398,17 @@ Save the result in ".txt" or ".csv" format
 ```{r,eval=TRUE,echo=TRUE}    
 
 
-write.table(resAnnotated,file="DESeq_result.txt",                                                                                                  sep="\t")
-write.csv(resAnnotated,file="DESeq_result.csv",                                                                                                    row.names=F)
+write.table(resAnnotated,file="DESeq_result.txt",sep="\t")
+write.csv(resAnnotated,file="DESeq_result.csv",  row.names=F)
 
       
 ```
 
+
 Exploring results
 ========================================================
+
+We can summarize some basic tallies using the summary function.
 
 ```{r,eval=TRUE,echo=TRUE}
 
@@ -415,6 +422,7 @@ sum(res$padj < 0.05, na.rm=TRUE)
 
 MA plot
 ========================================================
+
 The  function **plotMA()** shows  the  log2  fold  changes  attributable  to  a  given  variable  over  the  mean of normalized counts.  Points will be colored red if the adjusted p value is less than 0.1.  Points which fall out of the window are plotted as open triangles pointing either up or down.
 
 ```{r,eval=TRUE,echo=TRUE}
@@ -423,14 +431,26 @@ plotMA(res, main="DESeq2", ylim=c(-4,4))
 
 ```
 
+After calling plotMA, we can use the function identify to interactively detect the row number of individual
+genes by clicking on the plot. 
+Recover the gene identifiers by saving the resulting indices:
+
+```{r,eval=FALSE,echo=TRUE}
+idx <- identify(res$baseMean, res$log2FoldChange)
+rownames(res)[idx]
+
+```
+
+
 Plot counts
 ========================================================
  **Plot of normalized counts for a single gene on log scale**
 
 ```{r,eval=TRUE,echo=TRUE}
-plotCounts(dds,gene=which.min(res$padj),                                                                                                 intgroup="Group")
+plotCounts(dds,gene=which.min(res$padj),intgroup="Group")
 
 ```
+
 
 
 Exercises
@@ -448,108 +468,93 @@ Transformation of count data
 ========================================================
 id: explore
 
-In order to test for differential expression, we operate on raw counts. However for other downstream analyses { e.g. for visualization or clustering } it is useful to work with transformed versions of the count data.
+In order to test for differential expression, we operate on raw counts. However for other downstream analyses ( e.g. visualization or clustering) it is useful to work with transformed versions of the count data.
 
-The regularized logarithm or rlog incorporates a prior 
-on the sample differences, and the other uses the concept of variance stabilizing transformations.
+Aim of these transformations,is  to  remove  the  dependence  of  the  variance on  the  mean, particularly  the  high  variance  of  the  logarithm  of  count  data  when  the  mean  is  low. 
 
-The function **rlog** (regularized log), transforms the original count data to the log2 scale.
+    y = log2(n + n0)
+            
+    n represents the count values and n0 is a positive constant.
+    
+ There are two alternative approaches of choosing the parameter equivalent to n0 above.
 
-Aim of this transformation,  the rlog,  is  to  remove  the  dependence  of  the  variance on  the  mean,  so that data is suitable for visualization. 
-Particularly  the  high  variance  of  the  logarithm  of  count  data  when  the  mean  is  low. 
+**1. The regularized logarithm or rlog**
+
+**2. variance stabilizing transformation or vst**
+
+
+Both transforms the original count data to the log2 scale normalized to library size.
+
+
 ```{r,eval=TRUE,echo=TRUE}
 rld<-rlog(dds)  
+
+vsd <- varianceStabilizingTransformation(dds)
 
 ```
 
 Transformation of count data
 ========================================================
 
-<div align="center">
-<img src="gene.png" alt="gene" height="400" width="800">
+<div align="left">
+<img src="gene.png" alt="gene" height="400" width="600">
 </div>
-<div align="center">
-<img src="rlog.png" alt="gene" height="400" width="800">
+<div align="topright">
+<img src="rlog.png" alt="gene" height="400" width="600">
 </div>
 
 
-Data quality assessment by sample clustering and visualization
 ========================================================
+
+<div align="center">
+<img src="vst.png" alt="gene" height="400" width="600">
+</div>
+
+
+Data quality assessment 
+========================================================
+
 Data quality assessment and quality control  are essential steps
 of any data analysis. These steps should typically be performed very early in the analysis of a new data set,
 preceding or in parallel to the differential expression testing.
+
+We will use following visualization tools to assess the data quality.
+
+* Heatmap of count matrix
+
+* Heatmap of sample to sample distances
+
+* Principal component analysis plot
+
 
 Heatmap of the count matrix
 ========================================================
 
 To explore a counts matrix, it is often useful to look it as heatmap.
 
-The assay function is used to extract the matrix of normalized values
+
 
 ```{r,eval=TRUE,echo=TRUE}
 
-rlogcount <- assay(rld)      
-rlogcount <- rlogcount[!rowSums(rlogcount) == 0,]
+library("pheatmap")
+select <- order(rowMeans(counts(dds,normalized=TRUE)),decreasing=TRUE)[1:20]
 
-# generate DE gene list
-  DEgenes4heatmap<-res[res$padj<0.05 & !is.na(res$padj),]
-# show the number of DE genes
-  nrow(DEgenes4heatmap)
-# retrieve rlog values for DE genes
-  rlog4heatmap<-rlogcount[rownames(rlogcount) %in% rownames(DEgenes4heatmap),]
-  dim(rlog4heatmap)
+
+pheatmap(assay(rld)[select,])
+
+
 ```
+
+
 
 Heatmap of the count matrix
 ========================================================
 
 ```{r,eval=TRUE,echo=TRUE}
-head(rlog4heatmap)
-```
 
-Heatmap of the count matrix
-========================================================
-
-```{r,eval=FALSE,echo=TRUE}
-png(file="heatmap1.png")
-  testla1<-heatmap.2(rlog4heatmap, Rowv=T, 
-      Colv=F, dendrogram="row", cexCol=0.75,cexRow=0.35, 
-      keysize=1, cex.main=0.5,symkey=FALSE, trace="none", 
-      density.info="none", xlab="samples",
-      main="heatmap of rlog value")
-dev.off()
+pheatmap(assay(vsd)[select,])
 
 ```
-
-=======================================================
-<div align="center">
-<img src="heatmap1.png" alt="gene" height="900" width="900">
-</div>
-
-Heatmap of the count matrix
-========================================================
-
-
-```{r,eval=FALSE,echo=TRUE}
-scaled_matrix<-t(scale(t(rlog4heatmap)))
-show_distance_scale<-dist(scaled_matrix, method="euclidean")
-show_cluster_scaled<- hclust(show_distance_scale, method="complete")
-
-png(file="heatmap2.png")
-  testla2<-heatmap.2(rlog4heatmap, Rowv=as.dendrogram(show_cluster_scaled), 
-      Colv=F, scale="row", dendrogram="row", cexCol=0.75,cexRow=0.35, 
-      keysize=1, cex.main=0.5,symkey=FALSE, trace="none", 
-      density.info="none", xlab="samples",
-      main="z-score heatmap")
-dev.off()
-
-```
-
-=======================================================
-
-<div align="center">
-<img src="heatmap2.png" alt="gene" height="900" width="900">
-</div>
 
 
 
@@ -559,9 +564,12 @@ Heatmap of sample to sample distances
 Another use of the transformed data is sample clustering. Here, we apply the dist function to the transpose
 of the transformed count matrix to get sample-to-sample distances. 
 
+The assay function is used to extract the matrix of normalized values.
 
 ```{r,eval=TRUE,echo=TRUE}   
 
+
+rlogcount <- assay(rld)    
 sampleDists <- as.matrix(dist(t(rlogcount)))
          
 ```
@@ -652,12 +660,36 @@ Solutions
 Variations to standard workflow
 ========================================================
 
-Using Contrasts
+
+**Factor levels**
+
+By default, R will choose a reference level for factors based on alphabetical order. 
+The comparisons will be based on the alphabetical order of the levels. We can either explicitly tell results which comparison to make using the contrast argument (this will be shown later), or
+we can explicitly set the factors levels.
+
+**Setting the factor levels**
+
+cData$Group <- factor(cData$Group, levels=c("Viv","Hfd"))
+
+or using relevel, just specifying the reference level:
+
+```{r,eval=TRUE,echo=TRUE} 
+
+
+cData$Group<-relevel(cData$Group,ref="Viv")
+
+
+```
+
+
+=========================================================
+
+**Using Contrasts**
 
 Contrasts enable the user to generate results for all  possible
 comparisons: 
 
-Imagine an experimental design containing a factor with three levels, say A, B and C.
+Consider an experimental design containing a factor with three levels, say A, B and C.
 We can use contrasts to compare B vs A, of C vs A, and C vs B.
 
 ```{r,eval=TRUE,echo=TRUE}    
@@ -670,31 +702,12 @@ We can use contrasts to compare B vs A, of C vs A, and C vs B.
 ```
 
 
-Interactions
-========================================================
-
-Interaction terms can be added to the design formula, in order to test, for example, if the log2 fold change
-attributable to a given condition is different based on another factor, for example if the condition effect differs across genotype.
-
-A simple approach to study interaction is to perform the following steps:
-1. combine the factors of interest into a single factor with all combinations of the original factors
-2. change the design to include just this factor, e.g.  group
-
-
-```{r,eval=FALSE,echo=TRUE}
-
-dds$group <- factor(paste0(dds$genotype, dds$condition))
-design(dds) <- ~ group
-dds <- DESeq(dds)
-resultsNames(dds)
-results(dds, contrast=c("group", "IB", "IA"))
-
-```
 
 
 Multi factor designs
 ========================================================
 Experiments  with  more  than  one  factor  influencing  the  counts  can  be  analyzed  using  design  formula  that  include  the  additional  variables. 
+
 ```{r,eval=TRUE,echo=TRUE}
 targets
 
@@ -794,15 +807,39 @@ summary(resLRTorder)
 
 ```
 
+
+Interactions
+========================================================
+
+Interaction terms can be added to the design formula, in order to test, for example, if the log2 fold change
+attributable to a given condition is different based on another factor, for example if the condition effect differs across genotype.
+
+A simple approach to study interaction is to perform the following steps:
+1. combine the factors of interest into a single factor with all combinations of the original factors
+2. change the design to include just this factor, e.g.  group
+
+
+```{r,eval=FALSE,echo=TRUE}
+
+dds$newgroup <- factor(paste0(dds$Group, dds$Batch))
+design(dds) <- ~ newgroup
+dds <- DESeq(dds)
+resultsNames(dds)
+results(dds, contrast=c("newgroup", "Viva", "Hfda"))
+
+```
+
+
+
 Exercises
 =========================================================
 
-* [RNAseq Exercises](http://mrccsc.github.io/RNAseq_short/course/Exercise_FunctionalAnalysis.html)
+* [RNAseq Exercises](http://mrccsc.github.io/RNAseq_short/course/Exercise_MultifactorAnalysis.html)
 
 Solutions
 =========================================================
 
-* [RNAseq Solutions](http://mrccsc.github.io/RNAseq_short/course/Answers_FunctionalAnalysis.html)
+* [RNAseq Solutions](http://mrccsc.github.io/RNAseq_short/course/Answers_MultifactorAnalysis.html)
 
 
 
@@ -855,13 +892,8 @@ depending on its length, given by the PWF
 ```{r,eval=TRUE,echo=TRUE}                         
 
   
-pwf=nullp(degenes,genome="mm9",'ensGene',                                                                              plot.fit=FALSE)
+pwf=nullp(degenes,genome="mm9",'ensGene', plot.fit=FALSE)
   
-```
-
-========================================================
-
-```{r,eval=TRUE,echo=TRUE}
   head(pwf)
 ```
 
@@ -900,7 +932,7 @@ categories among DE genes
 ```{r,eval=TRUE,echo=TRUE}
     
 
-go<-goseq(pwf,genome="mm9",'ensGene',                                                                                                              test.cats=c("GO:BP","GO:MF","KEGG"))
+go<-goseq(pwf,genome="mm9",'ensGene', test.cats=c("GO:BP","GO:MF","KEGG"))
   
 ```
 

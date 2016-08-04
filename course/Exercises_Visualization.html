@@ -124,6 +124,7 @@ $(document).ready(function () {
 
 
 <ol style="list-style-type: decimal">
+<li><p>Transform the count data using rlog and vst method.</p></li>
 <li><ol style="list-style-type: lower-alpha">
 <li>Perform the Principal Component Analysis using rlog method and find out % significance values of first two principal components .</li>
 </ol></li>
@@ -131,13 +132,9 @@ $(document).ready(function () {
 <ol start="2" style="list-style-type: lower-alpha">
 <li>Repeat the PCA, this time using VST method and compare the plots with the ones obtained using rlog method.</li>
 </ol>
-<ol start="2" style="list-style-type: decimal">
-<li><p>Perform sample clustering and compare it with the clusters obtained using PCA.</p></li>
-<li><p>Draw MA plot and highlight all significant genes with adjusted p value less than 0.05.</p></li>
-<li><p>Draw a heatmap based on top 40 differentially expressed genes.</p></li>
-<li><ol style="list-style-type: lower-alpha">
-<li>Use function plotCounts() to plot the counts for gene ENSMUSG00000024526. (b) Plot the unnormalized counts.</li>
-</ol></li>
+<ol start="3" style="list-style-type: decimal">
+<li><p>Perform clustering based on sample to sample distances and compare it with the clusters obtained using PCA.</p></li>
+<li><p>Draw a heatmap of count matrix based on top 40 differentially expressed genes using rlog and vst data.</p></li>
 </ol>
 
 
