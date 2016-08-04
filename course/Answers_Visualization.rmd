@@ -8,11 +8,27 @@ Website: http://bioinformatics.csc.mrc.ac.uk/training.html
 
 1. Transform the count data using rlog and vst method.
 
+```{r,collapse=T,warning=FALSE,echo=FALSE,eval=TRUE,message=FALSE}
+
+suppressPackageStartupMessages(library(DESeq2))
+
+targetsE <- read.table("Exercise_ShortRNAseq_sample.info",sep="\t",header=TRUE)
+
+AllCountsE<-read.csv(file="Exercise_ShortRNAseq_counts.csv",header=T,row.names=1)
+
+cDataE<-data.frame(name=targetsE$sample,condition=targetsE$condition,batch=targetsE$batch)
+
+ddsE<-DESeqDataSetFromMatrix(countData= AllCountsE,colData=cDataE,design=~batch+condition)
+ddsE<-DESeq(ddsE)
+
+```
+
+
 ```{r,eval=TRUE,echo=TRUE}
 
-rld<-rlog(dds)  
+rldE<-rlog(ddsE)  
 
-vsd <- varianceStabilizingTransformation(dds)
+vsdE <- varianceStabilizingTransformation(ddsE)
 
 ```
 
@@ -23,7 +39,8 @@ vsd <- varianceStabilizingTransformation(dds)
 suppressPackageStartupMessages(library(DESeq2))
 
 
-plotPCA(rld, intgroup="condition")
+plotPCA(rldE, intgroup="condition")
+dataE <- plotPCA(rldE, intgroup=c("condition"), returnData=TRUE)
 
 ```
 
@@ -32,7 +49,7 @@ plotPCA(rld, intgroup="condition")
 ```{r, echo=T,eval=FALSE}
  
 
-plotPCA(vsd, intgroup="condition")
+plotPCA(vsdE, intgroup="condition")
 
 ```
  
@@ -40,29 +57,33 @@ plotPCA(vsd, intgroup="condition")
 
 ```{r,eval=TRUE,echo=TRUE}   
 
+suppressPackageStartupMessages(library(gplots))
 
-rlogcount <- assay(rld)    
-sampleDists <- as.matrix(dist(t(rlogcount)))
+rlogcountE <- assay(rldE)    
+sampleDistsE <- as.matrix(dist(t(rlogcountE)))
+suppressPackageStartupMessages(library(RColorBrewer))
 
-heatmap.2(as.matrix(sampleDists), key=F, trace="none",
+showcols <- brewer.pal(8, "Set1")[1:length(unique(colData(ddsE)$condition))]
+
+heatmap.2(as.matrix(sampleDistsE), key=F, trace="none",
     col=colorpanel(100, "black", "white"),
-    ColSideColors=showcols[colData(dds)$Group], 
-    RowSideColors=showcols[colData(dds)$Group],
+    ColSideColors=showcols[colData(ddsE)$condition], 
+    RowSideColors=showcols[colData(ddsE)$condition],
     margin=c(10, 10), main="Sample Distance Matrix")
          
 ```
 
-4. Draw a heatmap of count matrix based on top 40 differentially expressed genes using rlog and vst data.
+4. Draw a heatmap of count matrix based on top 40 highly expressed genes using rlog and vst data.
 
 
 ```{r,eval=TRUE,echo=TRUE}
 
-library("pheatmap")
-select <- order(rowMeans(counts(dds,normalized=TRUE)),decreasing=TRUE)[1:20]
+suppressPackageStartupMessages(library("pheatmap"))
+select <- order(rowMeans(counts(ddsE,normalized=TRUE)),decreasing=TRUE)[1:40]
 
 
-pheatmap(assay(rld)[select,])
+pheatmap(assay(rldE)[select,])
 
-pheatmap(assay(vsd)[select,])
+pheatmap(assay(vsdE)[select,])
 
 ```

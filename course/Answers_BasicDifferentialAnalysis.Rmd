@@ -8,15 +8,15 @@ Website: http://bioinformatics.csc.mrc.ac.uk/training.html
 
 In this exercise, we will read in a count data from erythroblast differentiation experiment in mice. This data was downloaded from GEO database (http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE49843) and aligned to mm9 genome assembly using  Rsubread R package. More details with regards to this experiment please refer to (http://www.ncbi.nlm.nih.gov/pubmed/24092935). 
 
-* Material
+**Material**
 
-(1) Sample description: Exercise_ShortRNAseq_sample.info
+* Sample description: Exercise_ShortRNAseq_sample.info
 
-(2) Count data: Exercise_ShortRNAseq_counts.csv
+* Count data: Exercise_ShortRNAseq_counts.csv
 
 
 
-1. Read in the sample informattion and count data.
+1. Read in the sample information and count data.
    Identify how many factors this experiment involves.
 
 ```{r,collapse=T,warning=FALSE}
@@ -90,8 +90,6 @@ DE_res2<- DE_res2[DE_res2$padj<0.05 & abs(DE_res2$log2FoldChange)>1,]
 
 ```{r, echo=T,warnings=F,collapse=T}
 
-   
-
 # Add Gene Symbols
 
 library(biomaRt)
@@ -116,10 +114,12 @@ plotMA(res1, main="DESeq2", ylim=c(-4,4))
 
 ```
 
- 6. a) Use function plotCounts() to plot the counts for gene ENSMUSG00000024526. (b) Plot the unnormalized counts.
+ 6. a) Use function plotCounts() to plot the counts for gene 497097. (b) Plot the unnormalized counts.
  
 ```{r,eval=TRUE,echo=TRUE}
-plotCounts(dds,gene=which.min(res1$padj),intgroup="condition")
+plotCounts(dds,gene="497097",intgroup="condition")
+
+plotCounts(dds,gene="497097",intgroup="condition",normalized = FALSE)
 
 ```
 

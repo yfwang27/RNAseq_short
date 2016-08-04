@@ -6,6 +6,7 @@ output: html_document
 Website: http://bioinformatics.csc.mrc.ac.uk/training.html
 ---
 
+
 1. Use contrasts to specify the comparison you wish to make. Run comparisons between KOa vs FFa and KOb vs FFa. 
 
 2.  Perform differential expression analysis incorporating batch as additional factor. 

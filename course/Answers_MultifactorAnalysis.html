@@ -124,40 +124,97 @@ $(document).ready(function () {
 
 
 <ol style="list-style-type: decimal">
-<li>Using likelihood ratio test instead of the wald test,</li>
+<li>Use contrasts to specify the comparison you wish to make. Run comparisons between KOa vs FFa and KOb vs FFa.</li>
 </ol>
-<ol style="list-style-type: lower-alpha">
-<li><p>Find the number of genes that are changed because of condition at FDR 0.05 irrespective of fold change.</p></li>
-<li><p>Find the number of genes that are changed because of batch at FDR 0.05 irrespective of fold change.</p></li>
-</ol>
-<pre class="r"><code>
-ddsLRT&lt;-DESeqDataSetFromMatrix(countData=AllCounts,colData=cData,design=~batch+condition)
+<pre class="r"><code>    res_contrastE&lt;-results(ddsE,contrast=c(&quot;condition&quot;,&quot;KOa&quot;,&quot;FFa&quot;)) 
 
-# LRT analysis for the condition effect
-ddsLRT_con &lt;- DESeq(ddsLRT, test=&quot;LRT&quot;, full=~batch+condition, reduced=~batch) 
+    summary(res_contrastE)</code></pre>
+<pre><code>## 
+## out of 24695 with nonzero total read count
+## adjusted p-value &lt; 0.1
+## LFC &gt; 0 (up)     : 1185, 4.8% 
+## LFC &lt; 0 (down)   : 1257, 5.1% 
+## outliers [1]     : 0, 0% 
+## low counts [2]   : 8112, 33% 
+## (mean count &lt; 12)
+## [1] see 'cooksCutoff' argument of ?results
+## [2] see 'independentFiltering' argument of ?results</code></pre>
+<pre class="r"><code>    res_contrastE2&lt;-results(ddsE,contrast=c(&quot;condition&quot;,&quot;KOb&quot;,&quot;FFa&quot;)) 
 
-resddsLRT_con&lt;-results(ddsLRT_con)
-
-summary(resddsLRT_con,alpha=0.05)
-
-resLRTorder&lt;-resddsLRT_con[order(resddsLRT_con$padj),]
-</code></pre>
+    summary(res_contrastE2)</code></pre>
+<pre><code>## 
+## out of 24695 with nonzero total read count
+## adjusted p-value &lt; 0.1
+## LFC &gt; 0 (up)     : 1515, 6.1% 
+## LFC &lt; 0 (down)   : 1475, 6% 
+## outliers [1]     : 0, 0% 
+## low counts [2]   : 11451, 46% 
+## (mean count &lt; 26)
+## [1] see 'cooksCutoff' argument of ?results
+## [2] see 'independentFiltering' argument of ?results</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>Perform multi factor analysis by adding batch as factor to design.</li>
 </ol>
 <ol style="list-style-type: lower-alpha">
-<li>Find out number of genes that are changed because of batch as opposed to because of Group.</li>
+<li>Find the number of genes that are changed because of condition at FDR 0.05.</li>
+</ol>
+<pre class="r"><code>
+ddsE&lt;-DESeqDataSetFromMatrix(countData=AllCountsE,colData=cDataE,design=~batch+condition)
+dds_conditionE &lt;- DESeq(ddsE)
+
+resdds_conditionE&lt;-results(dds_conditionE)
+
+summary(resdds_conditionE,alpha=0.05)
+</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>Find the number of genes that are changed because of batch at FDR 0.05.</li>
+</ol>
+<pre class="r"><code>
+# LRT analysis for the batch effect
+
+ddsE&lt;-DESeqDataSetFromMatrix(countData=AllCountsE,colData=cDataE,design=~condition+batch)
+
+dds_batchE &lt;- DESeq(ddsE)
+
+resdds_batchE&lt;-results(dds_batchE)
+
+summary(resdds_batchE,alpha=0.05)
+</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>Repeat above analysis using likelihood ratio test instead of the wald test,</li>
+</ol>
+<ol style="list-style-type: lower-alpha">
+<li>Find the number of genes that are changed because of condition at FDR 0.05.</li>
+</ol>
+<pre class="r"><code>
+
+ddsLRT_conditionE &lt;- DESeq(ddsLRTE, test=&quot;LRT&quot;, full=~batch+condition, reduced=~batch)
+
+resddsLRT_conditionE&lt;-results(ddsLRT_conditionE)
+
+summary(resddsLRT_conditionE,alpha=0.05)
+</code></pre>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>Find the number of genes that are changed because of batch at FDR 0.05.</li>
 </ol>
 <pre class="r"><code>
 # LRT analysis for the batch effect
 
 
-ddsLRT_batch &lt;- DESeq(ddsLRT, test=&quot;LRT&quot;, full=~batch+condition, reduced=~condition)
+ddsLRT_batchE &lt;- DESeq(ddsLRTE, test=&quot;LRT&quot;, full=~batch+condition, reduced=~condition)
 
-resddsLRT_batch&lt;-results(ddsLRT_batch)
+resddsLRT_batchE&lt;-results(ddsLRT_batchE)
 
-summary(resddsLRT_batch,alpha=0.05)
+summary(resddsLRT_batchE,alpha=0.05)
 </code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li>Introduce interaction in your design to to see if there is interaction between two factors involved in your design.</li>
+</ol>
+<pre class="r"><code>dds$newgroup &lt;- factor(paste0(ddsE$condition, ddsE$batch))
+design(dds) &lt;- ~ newgroup
+dds &lt;- DESeq(dds)
+resultsNames(dds)
+results(dds, contrast=c(&quot;newgroup&quot;, &quot;FFaa&quot;, &quot;KOaa&quot;))</code></pre>
 
 
 
