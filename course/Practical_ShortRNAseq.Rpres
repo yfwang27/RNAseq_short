@@ -835,7 +835,7 @@ results(dds, contrast=c("newgroup", "Viva", "Hfda"))
 Exercises
 =========================================================
 
-* [RNAseq Exercises](http://mrccsc.github.io/RNAseq_short/course/Exercise_MultifactorAnalysis.html)
+* [RNAseq Exercises](http://mrccsc.github.io/RNAseq_short/course/Exercises_MultifactorAnalysis.html)
 
 Solutions
 =========================================================
