@@ -6,13 +6,22 @@ output: html_document
 Website: http://bioinformatics.csc.mrc.ac.uk/training.html
 ---
 
-1. a) Perform the Principal Component Analysis using rlog method and find out % significance values of first two principal components .
+1. Transform the count data using rlog and vst method.
+
+```{r,eval=TRUE,echo=TRUE}
+
+rld<-rlog(dds)  
+
+vsd <- varianceStabilizingTransformation(dds)
+
+```
+
+2. a) Perform the Principal Component Analysis using rlog method and find out % significance values of first two principal components .
 
 ```{r, echo=T,eval=FALSE}
  
 suppressPackageStartupMessages(library(DESeq2))
 
-rld<-rlog(dds)
 
 plotPCA(rld, intgroup="condition")
 
@@ -20,11 +29,40 @@ plotPCA(rld, intgroup="condition")
 
  b) Repeat the PCA, this time using VST method and compare the plots with the ones obtained using rlog method.
  
-2. Perform sample clustering and compare it with the clusters obtained using PCA.
+```{r, echo=T,eval=FALSE}
+ 
 
-3. Draw MA plot and highlight all significant genes with adjusted p value less than 0.05.  
+plotPCA(vsd, intgroup="condition")
 
-4. Draw a heatmap based on top 40 differentially expressed genes.
+```
+ 
+3. Perform clustering based on sample to sample distances and compare it with the clusters obtained using PCA.
 
-5. a) Use function plotCounts() to plot the counts for gene ENSMUSG00000024526. (b) Plot the unnormalized counts.
+```{r,eval=TRUE,echo=TRUE}   
 
+
+rlogcount <- assay(rld)    
+sampleDists <- as.matrix(dist(t(rlogcount)))
+
+heatmap.2(as.matrix(sampleDists), key=F, trace="none",
+    col=colorpanel(100, "black", "white"),
+    ColSideColors=showcols[colData(dds)$Group], 
+    RowSideColors=showcols[colData(dds)$Group],
+    margin=c(10, 10), main="Sample Distance Matrix")
+         
+```
+
+4. Draw a heatmap of count matrix based on top 40 differentially expressed genes using rlog and vst data.
+
+
+```{r,eval=TRUE,echo=TRUE}
+
+library("pheatmap")
+select <- order(rowMeans(counts(dds,normalized=TRUE)),decreasing=TRUE)[1:20]
+
+
+pheatmap(assay(rld)[select,])
+
+pheatmap(assay(vsd)[select,])
+
+```

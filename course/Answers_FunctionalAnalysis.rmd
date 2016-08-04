@@ -7,6 +7,7 @@ Website: http://bioinformatics.csc.mrc.ac.uk/training.html
 ---
 
 
+
 1.  Using the genes that are changed because of condition at FDR 0.05 irrespective of fold change as our differentially expressed genes, perform the Gene Ontology and Pathway Enrichment Analysis.
 
 ```{r, echo=T,eval=FALSE}

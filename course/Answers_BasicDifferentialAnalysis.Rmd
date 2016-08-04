@@ -90,12 +90,38 @@ DE_res2<- DE_res2[DE_res2$padj<0.05 & abs(DE_res2$log2FoldChange)>1,]
 
 ```{r, echo=T,warnings=F,collapse=T}
 
+   
 
+# Add Gene Symbols
+
+library(biomaRt)
+
+mart=useMart('ENSEMBL_MART_ENSEMBL',
+dataset='mmusculus_gene_ensembl',
+host="may2012.archive.ensembl.org")
+
+bm<-getBM(attributes=c('ensembl_gene_id',"gene_biotype" ,"description" ,'mgi_symbol'),filters ='ensembl_gene_id',values=rownames(res1), mart=mart)
+
+resAnnotated <- merge(as.data.frame(res1),bm,by.x=0,by.y=1)
 
 
 
 ```
 
+5. Draw MA plot and highlight all significant genes with adjusted p value less than 0.05.  
+
+```{r,eval=TRUE,echo=TRUE}
+
+plotMA(res1, main="DESeq2", ylim=c(-4,4))
+
+```
+
+ 6. a) Use function plotCounts() to plot the counts for gene ENSMUSG00000024526. (b) Plot the unnormalized counts.
+ 
+```{r,eval=TRUE,echo=TRUE}
+plotCounts(dds,gene=which.min(res1$padj),intgroup="condition")
+
+```
 
 
 

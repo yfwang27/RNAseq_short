@@ -130,23 +130,21 @@ $(document).ready(function () {
 <p>Sample description: Exercise_ShortRNAseq_sample.info</p>
 <p>Count data: Exercise_ShortRNAseq_counts.csv</p>
 <ol style="list-style-type: decimal">
-<li></li>
-</ol>
-<ol style="list-style-type: lower-alpha">
-<li><p>First read in the sample informattion and count data.</p></li>
-<li><p>Identify how many factors this experiment involves.</p></li>
-</ol>
-<ol start="2" style="list-style-type: decimal">
-<li>Construct DESeqDataSet object using sample information and counts data.</li>
-</ol>
-<p>Now you have the count table as deseqdataset, you can start to perform the DE analysis.</p>
-<ol start="3" style="list-style-type: decimal">
+<li><p>Read in sample information and count data. Identify how many factors are involved in this this experiment.</p></li>
+<li><p>Construct DESeqDataSet object using sample information and counts data.</p></li>
 <li><ol style="list-style-type: lower-alpha">
 <li>Find the number of genes that are changed in knockdown samples versus control, i.e. KOa vs FFa and KOb vs FFa, at FDR 0.05 irrespective of fold change.</li>
 </ol></li>
 </ol>
 <ol start="2" style="list-style-type: lower-alpha">
 <li>Find the number of genes that are changed in the above situation with fold change threshold, i.e. fold change ratio &gt; 2.</li>
+</ol>
+<ol start="4" style="list-style-type: decimal">
+<li><p>Using Biomart, add extra columns to the results dataframe such as gene name, gene biotype, gene description etc.</p></li>
+<li><p>Draw MA plot and highlight all significant genes with adjusted p value less than 0.05.</p></li>
+<li><ol style="list-style-type: lower-alpha">
+<li>Use function plotCounts() to plot the counts for gene ENSMUSG00000024526. (b) Plot the unnormalized counts.</li>
+</ol></li>
 </ol>
 
 

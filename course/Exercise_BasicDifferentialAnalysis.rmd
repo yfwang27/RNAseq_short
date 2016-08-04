@@ -28,6 +28,10 @@ In this exercise, we will read in a count data from erythroblast differentiation
  
  4. Using Biomart, add extra columns to the results dataframe such as gene name, gene biotype, gene description etc. 
  
+ 5. Draw MA plot and highlight all significant genes with adjusted p value less than 0.05.  
+
+ 6. a) Use function plotCounts() to plot the counts for gene ENSMUSG00000024526. (b) Plot the unnormalized counts.
+ 
 
 
 

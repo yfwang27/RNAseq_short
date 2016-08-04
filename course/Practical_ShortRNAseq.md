@@ -53,9 +53,14 @@ You may navigate to the unarchived RNAseq_short/course folder in the Rstudio men
 
 **Session -> Set Working Directory -> Choose Directory**
 
-or in the console.
+or in the console, 
 
 Use the getwd() to see where your current directory is
+
+
+```r
+getwd()
+```
 
 Use setwd() to set up your directory in the console
 
@@ -64,22 +69,22 @@ Use setwd() to set up your directory in the console
 setwd("/PathToMyDownload/RNAseq_short/course")
 ```
 
-**setwd("~/Downloads/RNAseq_short/course")**
+
 
 Quality Assessment
 ========================================================
 id: quality
 
-Quality assessment can be performed at various levels such as raw reads, aligned data, count data
+Quality assessment can be performed at various levels such as raw reads, aligned data, count data.
 
 Basic checks on the raw data include checking sequence quality, GC content, adaptor contamination,
 duplication levels etc. 
 
-Bioconductor packages such as Rsubreads, EDAseq provides functions to retrieve and visualize 
+Bioconductor packages such as Rsubreads, EDAseq, ShortRead provides functions to retrieve and visualize 
 various quality metrics.
 
 
-Detailed information can be found [here](https://github.com/sanjaykhadayate/rnacourse/blob/master/practical.md).
+Detailed information can be found [here](https://mrccsc.github.io/Alignment/course/Alignment.html#/13).
 
 
 
@@ -93,11 +98,11 @@ First step in RNA-Seq data analysis is to align the raw reads to genome/transcri
 For RNASeq data alignment, aligner need to be able to align across the exon-exon junction.
 
 There are many tools that perform splice aware alignment of rnaseq data
-such as Tophat, Rsubreads etc.
+such as Tophat, Rsubreads etc. One can also use SpliceMap function from Rbowtie package.
 
 Output of this step is aligned data in [SAM/BAM format](http://mrccsc.github.io/genomicFormats.html#/11).  
 
- More information about [alignment](https://github.com/sanjaykhadayate/rnacourse/blob/master/practical.md).
+ More information about [alignment](https://mrccsc.github.io/Alignment/course/Alignment.html#/32).
 
 
 
@@ -113,8 +118,11 @@ Output of this step is a count table with reads assigned to individual features.
 This is usually called as raw counts and is input for many tools that perform the
 differential expression analysis. 
 
+For counting aligned reads in genes, the summarizeOverlaps function
+of GenomicAlignments with mode="Union" can be used, resulting in a RangedSummarizedExperiment
+object.
 
-More info about [Read counting](https://github.com/sanjaykhadayate/rnacourse/blob/master/practical.md).
+More info about [Read counting](https://mrccsc.github.io/Alignment/course/Alignment.html#/54).
 
 
 Material
@@ -146,11 +154,7 @@ Read in **targets.txt** file by using read.table function
 
 ```r
 targets <- read.table("targets.txt",sep="\t",header=TRUE)  
-```
 
-========================================================
-
-```r
 targets
 ```
 
@@ -173,9 +177,6 @@ Load count data by using read.csv function
 ```r
 AllCounts<-read.csv(file="AllCounts.csv",row.names = 1)
 ```
-
-Read count data (Continued)
-========================================================
 
  Show first few rows of "AllCounts" object and the class of AllCounts object
 
@@ -215,22 +216,6 @@ cData<-data.frame(name=targets$Sample,                                          
 rownames(cData)<-cData[,1]
 ```
 
-Factor levels
-
-By default, R will choose a reference level for factors based on alphabetical order. 
-The comparisons will be based on the alphabetical order of the levels. We can either explicitly tell results which comparison to make using the contrast argument (this will be shown later), or
-we can explicitly set the factors levels.
-
-Setting the factor levels 
-
-cData$Group <- factor(cData$Group, levels=c("Viv","Hfd"))
-
-...or using relevel, just specifying the reference level:
-
-
-```r
-cData$Group<-relevel(cData$Group,ref="Viv")
-```
 
 
 Prepare deseqdataset object (Continued)
@@ -264,9 +249,17 @@ dds<-DESeq(dds)
 ?DESeq
 ```
 
+The function DESeq runs the following functions in order,
+
+**estimateSizeFactors()**
+
+**estimateDispersions()**
+
+**nbinomWaldTest()**
+
+
 DESeq function - estimateSizeFactors()
 ========================================================
-The function DESeq runs the following functions in order.
 
 
 1 - **Estimation of size factors**
@@ -284,6 +277,13 @@ sizeFactors(dds)
      Viv1      Viv2      Viv3      Hfd1      Hfd2      Hfd3 
 1.2430187 0.7755226 1.0501449 0.9457439 1.0124687 1.0515602 
 ```
+
+========================================================
+
+<div align="center">
+<img src="sizefactor.png" alt="gene" height="600" width="800">
+</div>
+
 
 DESeq function - estimateDispersions()
 ========================================================
@@ -307,24 +307,22 @@ head(dispersions(dds))
 plotDispEsts(dds)
 ```
 
-![plot of chunk unnamed-chunk-12](Practical_ShortRNAseq-figure/unnamed-chunk-12-1.png)
+![plot of chunk unnamed-chunk-11](Practical_ShortRNAseq-figure/unnamed-chunk-11-1.png)
 
 DESeq function - nbinomWaldTest()
 ========================================================
 3- **Hypothesis test for differential expression**
 
-Finally, the function tests whether each model coefficient differs significantly from zero, using previously calculated sizeFactors and dispersion estimates.
 
-DESeq2 reports the standard error for each Log Fold Change estimate.  
-
-For significance testing, DESeq2 uses a Wald test: Log Fold Change is divided by its standard error, resulting in a z-statistic, which is compared to a standard normal distribution to generate p values.
+For significance testing, DESeq2 by default uses a Wald test, where
+the function tests whether each model coefficient differs significantly from zero, using previously calculated sizeFactors and dispersion estimates.
 
 The Wald test P values  are adjusted for multiple testing using the procedure of Benjamini and Hochberg.
 
 
 
 ```r
-#  nbinomWaldTest()
+nbinomWaldTest()
 ```
 
 
@@ -335,15 +333,22 @@ Getting results
 
 Results tables are generated using the function **results()**, which extracts a results table with log2 fold changes, p  values and adjusted p values.
 
-```r
-# use the function "results()"
-res<-results(dds) 
+ Use the function "results()"
 
-# Order results by adjusted p value 
+
+```r
+res<-results(dds) 
+```
+
+ Order results by adjusted p value
+
+
+```r
 resOrdered<-res[order(res$padj),]
 
 ?results      
 ```
+
 
 Getting results
 ========================================================
@@ -354,25 +359,25 @@ head(resOrdered)
 ```
 
 ```
-log2 fold change (MAP): Group Hfd vs Viv 
-Wald test p-value: Group Hfd vs Viv 
+log2 fold change (MAP): Group Viv vs Hfd 
+Wald test p-value: Group Viv vs Hfd 
 DataFrame with 6 rows and 6 columns
                      baseMean log2FoldChange     lfcSE      stat
                     <numeric>      <numeric> <numeric> <numeric>
-ENSMUSG00000024526   465.8790       5.863472 0.2482237  23.62172
-ENSMUSG00000032080 14291.8178       4.528817 0.2277876  19.88175
-ENSMUSG00000026475  3141.2571       4.420009 0.2531844  17.45767
-ENSMUSG00000069170   343.9283       3.645414 0.2240519  16.27040
-ENSMUSG00000042041   651.0023       2.971362 0.1892775  15.69844
-ENSMUSG00000034634   199.3508       4.344026 0.2806835  15.47660
+ENSMUSG00000024526   465.8790      -5.863471 0.2482237 -23.62172
+ENSMUSG00000032080 14291.8178      -4.528817 0.2277876 -19.88176
+ENSMUSG00000026475  3141.2571      -4.420009 0.2531844 -17.45767
+ENSMUSG00000069170   343.9283      -3.645414 0.2240519 -16.27040
+ENSMUSG00000042041   651.0023      -2.971362 0.1892775 -15.69844
+ENSMUSG00000034634   199.3508      -4.344026 0.2806835 -15.47660
                           pvalue          padj
                        <numeric>     <numeric>
-ENSMUSG00000024526 2.305693e-123 3.941351e-119
-ENSMUSG00000032080  5.855093e-88  5.004348e-84
-ENSMUSG00000026475  3.009884e-68  1.715032e-64
-ENSMUSG00000069170  1.601067e-59  6.842160e-56
-ENSMUSG00000042041  1.550038e-55  5.299270e-52
-ENSMUSG00000034634  4.991683e-54  1.422130e-50
+ENSMUSG00000024526 2.305664e-123 3.941302e-119
+ENSMUSG00000032080  5.854814e-88  5.004109e-84
+ENSMUSG00000026475  3.009769e-68  1.714966e-64
+ENSMUSG00000069170  1.601048e-59  6.842080e-56
+ENSMUSG00000042041  1.550018e-55  5.299202e-52
+ENSMUSG00000034634  4.991579e-54  1.422101e-50
 ```
 
 Add Gene symbol
@@ -388,7 +393,7 @@ mart=useMart('ENSEMBL_MART_ENSEMBL',
 dataset='mmusculus_gene_ensembl',
 host="may2012.archive.ensembl.org")
 
-bm<-getBM(attributes=c('ensembl_gene_id',                                                                                         'mgi_symbol'),
+bm<-getBM(attributes=c('ensembl_gene_id','mgi_symbol'),
 filters ='ensembl_gene_id',
 values=rownames(resOrdered), mart=mart)
 
@@ -418,19 +423,19 @@ head(resAnnotated)
 
 ```
            Row.names     baseMean log2FoldChange     lfcSE        stat
-1 ENSMUSG00000000001 2.438865e+03    0.009915849 0.1088892  0.09106366
+1 ENSMUSG00000000001 2.438865e+03   -0.009915849 0.1088892 -0.09106364
 2 ENSMUSG00000000003 0.000000e+00             NA        NA          NA
-3 ENSMUSG00000000028 3.803191e+01    0.218532207 0.3005797  0.72703575
-4 ENSMUSG00000000031 1.419411e+01    1.661493987 0.3665356  4.53296748
-5 ENSMUSG00000000037 4.993369e-01    0.197619851 0.1948394  1.01427043
-6 ENSMUSG00000000049 3.907640e+04   -0.107573652 0.1350213 -0.79671641
+3 ENSMUSG00000000028 3.803191e+01   -0.218532198 0.3005797 -0.72703575
+4 ENSMUSG00000000031 1.419411e+01   -1.661493799 0.3665356 -4.53296731
+5 ENSMUSG00000000037 4.993369e-01   -0.197619794 0.1948394 -1.01427038
+6 ENSMUSG00000000049 3.907640e+04    0.107573651 0.1350213  0.79671637
         pvalue         padj mgi_symbol
-1 9.274420e-01 0.9768743382      Gnai3
+1 9.274420e-01 0.9768743543      Gnai3
 2           NA           NA       Pbsn
-3 4.672041e-01 0.7750466011      Cdc45
-4 5.816077e-06 0.0001606139        H19
-5 3.104537e-01           NA      Scml2
-6 4.256158e-01 0.7465828969       Apoh
+3 4.672041e-01 0.7750466744      Cdc45
+4 5.816082e-06 0.0001606141        H19
+5 3.104538e-01           NA      Scml2
+6 4.256158e-01 0.7465829395       Apoh
 ```
 
 ```r
@@ -450,20 +455,20 @@ head(resAnnotated)
 ```
 
 ```
-         ensembl_gene_id   baseMean log2FoldChange     lfcSE     stat
-4582  ENSMUSG00000024526   465.8790       5.863472 0.2482237 23.62172
-8820  ENSMUSG00000032080 14291.8178       4.528817 0.2277876 19.88175
-5617  ENSMUSG00000026475  3141.2571       4.420009 0.2531844 17.45767
-20354 ENSMUSG00000069170   343.9283       3.645414 0.2240519 16.27040
-12526 ENSMUSG00000042041   651.0023       2.971362 0.1892775 15.69844
-9814  ENSMUSG00000034634   199.3508       4.344026 0.2806835 15.47660
+         ensembl_gene_id   baseMean log2FoldChange     lfcSE      stat
+4582  ENSMUSG00000024526   465.8790      -5.863471 0.2482237 -23.62172
+8820  ENSMUSG00000032080 14291.8178      -4.528817 0.2277876 -19.88176
+5617  ENSMUSG00000026475  3141.2571      -4.420009 0.2531844 -17.45767
+20354 ENSMUSG00000069170   343.9283      -3.645414 0.2240519 -16.27040
+12526 ENSMUSG00000042041   651.0023      -2.971362 0.1892775 -15.69844
+9814  ENSMUSG00000034634   199.3508      -4.344026 0.2806835 -15.47660
              pvalue          padj    mgi_symbol
-4582  2.305693e-123 3.941351e-119         Cidea
-8820   5.855093e-88  5.004348e-84         Apoa4
-5617   3.009884e-68  1.715032e-64         Rgs16
-20354  1.601067e-59  6.842160e-56         Gpr98
-12526  1.550038e-55  5.299270e-52 2010003K11Rik
-9814   4.991683e-54  1.422130e-50          Ly6d
+4582  2.305664e-123 3.941302e-119         Cidea
+8820   5.854814e-88  5.004109e-84         Apoa4
+5617   3.009769e-68  1.714966e-64         Rgs16
+20354  1.601048e-59  6.842080e-56         Gpr98
+12526  1.550018e-55  5.299202e-52 2010003K11Rik
+9814   4.991579e-54  1.422101e-50          Ly6d
 ```
 
 Saving DEseq2 results
@@ -473,12 +478,15 @@ Save the result in ".txt" or ".csv" format
 
 
 ```r
-write.table(resAnnotated,file="DESeq_result.txt",                                                                                                  sep="\t")
-write.csv(resAnnotated,file="DESeq_result.csv",                                                                                                    row.names=F)
+write.table(resAnnotated,file="DESeq_result.txt",sep="\t")
+write.csv(resAnnotated,file="DESeq_result.csv",  row.names=F)
 ```
+
 
 Exploring results
 ========================================================
+
+We can summarize some basic tallies using the summary function.
 
 
 ```r
@@ -489,8 +497,8 @@ summary(res)
 
 out of 22605 with nonzero total read count
 adjusted p-value < 0.1
-LFC > 0 (up)     : 1467, 6.5% 
-LFC < 0 (down)   : 989, 4.4% 
+LFC > 0 (up)     : 989, 4.4% 
+LFC < 0 (down)   : 1467, 6.5% 
 outliers [1]     : 18, 0.08% 
 low counts [2]   : 5493, 24% 
 (mean count < 3)
@@ -510,6 +518,7 @@ sum(res$padj < 0.05, na.rm=TRUE)
 
 MA plot
 ========================================================
+
 The  function **plotMA()** shows  the  log2  fold  changes  attributable  to  a  given  variable  over  the  mean of normalized counts.  Points will be colored red if the adjusted p value is less than 0.1.  Points which fall out of the window are plotted as open triangles pointing either up or down.
 
 
@@ -519,16 +528,28 @@ plotMA(res, main="DESeq2", ylim=c(-4,4))
 
 ![plot of chunk unnamed-chunk-21](Practical_ShortRNAseq-figure/unnamed-chunk-21-1.png)
 
+After calling plotMA, we can use the function identify to interactively detect the row number of individual
+genes by clicking on the plot. 
+Recover the gene identifiers by saving the resulting indices:
+
+
+```r
+idx <- identify(res$baseMean, res$log2FoldChange)
+rownames(res)[idx]
+```
+
+
 Plot counts
 ========================================================
  **Plot of normalized counts for a single gene on log scale**
 
 
 ```r
-plotCounts(dds,gene=which.min(res$padj),                                                                                                 intgroup="Group")
+plotCounts(dds,gene=which.min(res$padj),intgroup="Group")
 ```
 
-![plot of chunk unnamed-chunk-22](Practical_ShortRNAseq-figure/unnamed-chunk-22-1.png)
+![plot of chunk unnamed-chunk-23](Practical_ShortRNAseq-figure/unnamed-chunk-23-1.png)
+
 
 
 Exercises
@@ -546,137 +567,94 @@ Transformation of count data
 ========================================================
 id: explore
 
-In order to test for differential expression, we operate on raw counts. However for other downstream analyses { e.g. for visualization or clustering } it is useful to work with transformed versions of the count data.
+In order to test for differential expression, we operate on raw counts. However for other downstream analyses ( e.g. visualization or clustering) it is useful to work with transformed versions of the count data.
 
-The regularized logarithm or rlog incorporates a prior 
-on the sample differences, and the other uses the concept of variance stabilizing transformations.
+Aim of these transformations,is  to  remove  the  dependence  of  the  variance on  the  mean, particularly  the  high  variance  of  the  logarithm  of  count  data  when  the  mean  is  low. 
 
-The function **rlog** (regularized log), transforms the original count data to the log2 scale.
+    y = log2(n + n0)
+            
+    n represents the count values and n0 is a positive constant.
+    
+ There are two alternative approaches of choosing the parameter equivalent to n0 above.
 
-Aim of this transformation,  the rlog,  is  to  remove  the  dependence  of  the  variance on  the  mean,  so that data is suitable for visualization. 
-Particularly  the  high  variance  of  the  logarithm  of  count  data  when  the  mean  is  low. 
+**1. The regularized logarithm or rlog**
+
+**2. variance stabilizing transformation or vst**
+
+
+Both transforms the original count data to the log2 scale normalized to library size.
+
+
 
 ```r
 rld<-rlog(dds)  
+
+vsd <- varianceStabilizingTransformation(dds)
 ```
 
 Transformation of count data
 ========================================================
 
-<div align="center">
-<img src="gene.png" alt="gene" height="400" width="800">
+<div align="left">
+<img src="gene.png" alt="gene" height="400" width="600">
 </div>
-<div align="center">
-<img src="rlog.png" alt="gene" height="400" width="800">
+<div align="topright">
+<img src="rlog.png" alt="gene" height="400" width="600">
 </div>
 
 
-Data quality assessment by sample clustering and visualization
 ========================================================
+
+<div align="center">
+<img src="vst.png" alt="gene" height="400" width="600">
+</div>
+
+
+Data quality assessment 
+========================================================
+
 Data quality assessment and quality control  are essential steps
 of any data analysis. These steps should typically be performed very early in the analysis of a new data set,
 preceding or in parallel to the differential expression testing.
+
+We will use following visualization tools to assess the data quality.
+
+* Heatmap of count matrix
+
+* Heatmap of sample to sample distances
+
+* Principal component analysis plot
+
 
 Heatmap of the count matrix
 ========================================================
 
 To explore a counts matrix, it is often useful to look it as heatmap.
 
-The assay function is used to extract the matrix of normalized values
 
 
-```r
-rlogcount <- assay(rld)      
-rlogcount <- rlogcount[!rowSums(rlogcount) == 0,]
-
-# generate DE gene list
-  DEgenes4heatmap<-res[res$padj<0.05 & !is.na(res$padj),]
-# show the number of DE genes
-  nrow(DEgenes4heatmap)
-```
-
-```
-[1] 1970
-```
 
 ```r
-# retrieve rlog values for DE genes
-  rlog4heatmap<-rlogcount[rownames(rlogcount) %in% rownames(DEgenes4heatmap),]
-  dim(rlog4heatmap)
+library("pheatmap")
+select <- order(rowMeans(counts(dds,normalized=TRUE)),decreasing=TRUE)[1:20]
+
+
+pheatmap(assay(rld)[select,])
 ```
 
-```
-[1] 1970    6
-```
+![plot of chunk unnamed-chunk-25](Practical_ShortRNAseq-figure/unnamed-chunk-25-1.png)
+
+
 
 Heatmap of the count matrix
 ========================================================
 
 
 ```r
-head(rlog4heatmap)
+pheatmap(assay(vsd)[select,])
 ```
 
-```
-                        Viv1      Viv2      Viv3      Hfd1      Hfd2
-ENSMUSG00000033845 10.092301 10.155313 10.030213  9.831831  9.845330
-ENSMUSG00000048538 12.974443 13.079987 13.062451 12.288335 12.403877
-ENSMUSG00000025911 11.302820 11.202131 11.340154 11.108046 10.976286
-ENSMUSG00000067879  2.078839  2.102329  2.086773  2.259000  2.290127
-ENSMUSG00000025912  4.221647  4.247487  4.132955  4.720066  4.582192
-ENSMUSG00000056763  8.069013  8.068498  8.195348  7.822266  7.880444
-                        Hfd3
-ENSMUSG00000033845  9.840301
-ENSMUSG00000048538 12.473217
-ENSMUSG00000025911 11.004969
-ENSMUSG00000067879  2.222024
-ENSMUSG00000025912  4.552272
-ENSMUSG00000056763  7.846656
-```
-
-Heatmap of the count matrix
-========================================================
-
-
-```r
-png(file="heatmap1.png")
-  testla1<-heatmap.2(rlog4heatmap, Rowv=T, 
-      Colv=F, dendrogram="row", cexCol=0.75,cexRow=0.35, 
-      keysize=1, cex.main=0.5,symkey=FALSE, trace="none", 
-      density.info="none", xlab="samples",
-      main="heatmap of rlog value")
-dev.off()
-```
-
-=======================================================
-<div align="center">
-<img src="heatmap1.png" alt="gene" height="900" width="900">
-</div>
-
-Heatmap of the count matrix
-========================================================
-
-
-
-```r
-scaled_matrix<-t(scale(t(rlog4heatmap)))
-show_distance_scale<-dist(scaled_matrix, method="euclidean")
-show_cluster_scaled<- hclust(show_distance_scale, method="complete")
-
-png(file="heatmap2.png")
-  testla2<-heatmap.2(rlog4heatmap, Rowv=as.dendrogram(show_cluster_scaled), 
-      Colv=F, scale="row", dendrogram="row", cexCol=0.75,cexRow=0.35, 
-      keysize=1, cex.main=0.5,symkey=FALSE, trace="none", 
-      density.info="none", xlab="samples",
-      main="z-score heatmap")
-dev.off()
-```
-
-=======================================================
-
-<div align="center">
-<img src="heatmap2.png" alt="gene" height="900" width="900">
-</div>
+![plot of chunk unnamed-chunk-26](Practical_ShortRNAseq-figure/unnamed-chunk-26-1.png)
 
 
 
@@ -686,9 +664,11 @@ Heatmap of sample to sample distances
 Another use of the transformed data is sample clustering. Here, we apply the dist function to the transpose
 of the transformed count matrix to get sample-to-sample distances. 
 
+The assay function is used to extract the matrix of normalized values.
 
 
 ```r
+rlogcount <- assay(rld)    
 sampleDists <- as.matrix(dist(t(rlogcount)))
 ```
 
@@ -725,7 +705,7 @@ Principal component plot of the samples
 plotPCA(rld, intgroup="Group")
 ```
 
-![plot of chunk unnamed-chunk-30](Practical_ShortRNAseq-figure/unnamed-chunk-30-1.png)
+![plot of chunk unnamed-chunk-29](Practical_ShortRNAseq-figure/unnamed-chunk-29-1.png)
 
 ```r
 # save the plot
@@ -763,7 +743,7 @@ ggplot(data, aes(PC1, PC2,label=colData(dds)$name))+
   ylab(paste0("PC2: ",percentVar[2],"% variance"))
 ```
 
-![plot of chunk unnamed-chunk-32](Practical_ShortRNAseq-figure/unnamed-chunk-32-1.png)
+![plot of chunk unnamed-chunk-31](Practical_ShortRNAseq-figure/unnamed-chunk-31-1.png)
 
 ```r
 ggsave(file="PCA_plot_version2.png")
@@ -784,12 +764,33 @@ Solutions
 Variations to standard workflow
 ========================================================
 
-Using Contrasts
+
+**Factor levels**
+
+By default, R will choose a reference level for factors based on alphabetical order. 
+The comparisons will be based on the alphabetical order of the levels. We can either explicitly tell results which comparison to make using the contrast argument (this will be shown later), or
+we can explicitly set the factors levels.
+
+**Setting the factor levels**
+
+cData$Group <- factor(cData$Group, levels=c("Viv","Hfd"))
+
+or using relevel, just specifying the reference level:
+
+
+```r
+cData$Group<-relevel(cData$Group,ref="Viv")
+```
+
+
+=========================================================
+
+**Using Contrasts**
 
 Contrasts enable the user to generate results for all  possible
 comparisons: 
 
-Imagine an experimental design containing a factor with three levels, say A, B and C.
+Consider an experimental design containing a factor with three levels, say A, B and C.
 We can use contrasts to compare B vs A, of C vs A, and C vs B.
 
 
@@ -814,30 +815,12 @@ low counts [2]   : 5493, 24%
 ```
 
 
-Interactions
-========================================================
-
-Interaction terms can be added to the design formula, in order to test, for example, if the log2 fold change
-attributable to a given condition is different based on another factor, for example if the condition effect differs across genotype.
-
-A simple approach to study interaction is to perform the following steps:
-1. combine the factors of interest into a single factor with all combinations of the original factors
-2. change the design to include just this factor, e.g.  group
-
-
-
-```r
-dds$group <- factor(paste0(dds$genotype, dds$condition))
-design(dds) <- ~ group
-dds <- DESeq(dds)
-resultsNames(dds)
-results(dds, contrast=c("group", "IB", "IA"))
-```
 
 
 Multi factor designs
 ========================================================
 Experiments  with  more  than  one  factor  influencing  the  counts  can  be  analyzed  using  design  formula  that  include  the  additional  variables. 
+
 
 ```r
 targets
@@ -1014,15 +997,38 @@ low counts [2]   : 6761, 30%
 [2] see 'independentFiltering' argument of ?results
 ```
 
+
+Interactions
+========================================================
+
+Interaction terms can be added to the design formula, in order to test, for example, if the log2 fold change
+attributable to a given condition is different based on another factor, for example if the condition effect differs across genotype.
+
+A simple approach to study interaction is to perform the following steps:
+1. combine the factors of interest into a single factor with all combinations of the original factors
+2. change the design to include just this factor, e.g.  group
+
+
+
+```r
+dds$newgroup <- factor(paste0(dds$Group, dds$Batch))
+design(dds) <- ~ newgroup
+dds <- DESeq(dds)
+resultsNames(dds)
+results(dds, contrast=c("newgroup", "Viva", "Hfda"))
+```
+
+
+
 Exercises
 =========================================================
 
-* [RNAseq Exercises](http://mrccsc.github.io/RNAseq_short/course/Exercise_FunctionalAnalysis.html)
+* [RNAseq Exercises](http://mrccsc.github.io/RNAseq_short/course/Exercise_MultifactorAnalysis.html)
 
 Solutions
 =========================================================
 
-* [RNAseq Solutions](http://mrccsc.github.io/RNAseq_short/course/Answers_FunctionalAnalysis.html)
+* [RNAseq Solutions](http://mrccsc.github.io/RNAseq_short/course/Answers_MultifactorAnalysis.html)
 
 
 
@@ -1080,13 +1086,8 @@ depending on its length, given by the PWF
 
 
 ```r
-pwf=nullp(degenes,genome="mm9",'ensGene',                                                                              plot.fit=FALSE)
-```
-
-========================================================
-
-
-```r
+pwf=nullp(degenes,genome="mm9",'ensGene', plot.fit=FALSE)
+  
   head(pwf)
 ```
 
@@ -1107,7 +1108,7 @@ ENSMUSG00000033793       0    1907.0 0.12904384
    plotPWF(pwf)
 ```
 
-![plot of chunk unnamed-chunk-45](Practical_ShortRNAseq-figure/unnamed-chunk-45-1.png)
+![plot of chunk unnamed-chunk-44](Practical_ShortRNAseq-figure/unnamed-chunk-44-1.png)
 
 ========================================================
 
@@ -1136,7 +1137,7 @@ categories among DE genes
 
 
 ```r
-go<-goseq(pwf,genome="mm9",'ensGene',                                                                                                              test.cats=c("GO:BP","GO:MF","KEGG"))
+go<-goseq(pwf,genome="mm9",'ensGene', test.cats=c("GO:BP","GO:MF","KEGG"))
 ```
 
 ========================================================
@@ -1216,16 +1217,17 @@ attached base packages:
 [8] methods   base     
 
 other attached packages:
- [1] biomaRt_2.28.0             org.Mm.eg.db_3.3.0        
- [3] KEGG.db_3.2.3              AnnotationDbi_1.34.4      
- [5] ggplot2_2.1.0              RColorBrewer_1.1-2        
- [7] goseq_1.24.0               geneLenDataBase_1.8.0     
- [9] BiasedUrn_1.07             DESeq2_1.12.3             
-[11] SummarizedExperiment_1.2.3 Biobase_2.32.0            
-[13] GenomicRanges_1.24.2       GenomeInfoDb_1.8.3        
-[15] IRanges_2.6.1              S4Vectors_0.10.2          
-[17] BiocGenerics_0.18.0        edgeR_3.14.0              
-[19] limma_3.28.14              knitr_1.13                
+ [1] pheatmap_1.0.8             biomaRt_2.28.0            
+ [3] org.Mm.eg.db_3.3.0         KEGG.db_3.2.3             
+ [5] AnnotationDbi_1.34.4       ggplot2_2.1.0             
+ [7] RColorBrewer_1.1-2         goseq_1.24.0              
+ [9] geneLenDataBase_1.8.0      BiasedUrn_1.07            
+[11] DESeq2_1.12.3              SummarizedExperiment_1.2.3
+[13] Biobase_2.32.0             GenomicRanges_1.24.2      
+[15] GenomeInfoDb_1.8.3         IRanges_2.6.1             
+[17] S4Vectors_0.10.2           BiocGenerics_0.18.0       
+[19] edgeR_3.14.0               limma_3.28.14             
+[21] knitr_1.13                
 
 loaded via a namespace (and not attached):
  [1] Rcpp_0.12.5             locfit_1.5-9.1         
