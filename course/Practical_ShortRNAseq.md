@@ -45,6 +45,7 @@ Analysis Considerations
 * Is it a well annotated organism or a poorly annotated one. 
 
 ========================================================
+
 <div align="center">
 <img src="stranded_ex1.png" alt="strandedness" height="750" width="900">
 </div>
