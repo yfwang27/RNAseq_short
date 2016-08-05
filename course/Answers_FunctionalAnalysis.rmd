@@ -8,9 +8,30 @@ Website: http://bioinformatics.csc.mrc.ac.uk/training.html
 
 
 
-1.  Using the genes that are changed because of condition at FDR 0.05 irrespective of fold change as our differentially expressed genes, perform the Gene Ontology and Pathway Enrichment Analysis.
+1.  Using the differentially expressed genes because of condition (FDR 0.05 and irrespective of fold change), perform the Gene Ontology and Pathway Enrichment Analysis.
 
-```{r, echo=T,eval=FALSE}
+```{r,collapse=T,warning=FALSE,echo=FALSE,eval=TRUE,message=FALSE}
+
+suppressPackageStartupMessages(library(DESeq2))
+
+targetsE <- read.table("Exercise_ShortRNAseq_sample.info",sep="\t",header=TRUE)
+
+AllCountsE<-read.csv(file="Exercise_ShortRNAseq_counts.csv",header=T,row.names=1)
+
+cDataE<-data.frame(name=targetsE$sample,condition=targetsE$condition,batch=targetsE$batch)
+
+ddsE<-DESeqDataSetFromMatrix(countData= AllCountsE,colData=cDataE,design=~batch+condition)
+ddsE<-DESeq(ddsE)
+
+
+
+resLRTorder<-results(ddsE)
+
+
+
+```
+
+```{r, echo=T,eval=TRUE,message=FALSE}
 
 suppressPackageStartupMessages(library(KEGG.db))
 suppressPackageStartupMessages(library(goseq))
@@ -41,7 +62,7 @@ go<-goseq(pwf,'mm9','knownGene', test.cats=c("GO:BP","GO:MF","KEGG"))
 
 2. Change the Keggpath id to name in the goseq output
 
-```{r,eval=TRUE,echo=TRUE,eval=FALSE}
+```{r,eval=TRUE,echo=TRUE,message=FALSE}
 
 # function that converts KEGG id to KEGG description
 xx <- as.list(KEGGPATHID2NAME)

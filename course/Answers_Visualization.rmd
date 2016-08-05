@@ -34,7 +34,7 @@ vsdE <- varianceStabilizingTransformation(ddsE)
 
 2. a) Perform the Principal Component Analysis using rlog method and find out % significance values of first two principal components .
 
-```{r, echo=T,eval=FALSE}
+```{r, echo=T,eval=TRUE}
  
 suppressPackageStartupMessages(library(DESeq2))
 
@@ -46,7 +46,7 @@ dataE <- plotPCA(rldE, intgroup=c("condition"), returnData=TRUE)
 
  b) Repeat the PCA, this time using VST method and compare the plots with the ones obtained using rlog method.
  
-```{r, echo=T,eval=FALSE}
+```{r, echo=T,eval=TRUE}
  
 
 plotPCA(vsdE, intgroup="condition")

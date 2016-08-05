@@ -46,6 +46,10 @@ Analysis Considerations
 * What genome is involved?
 * Is it a well annotated organism or a poorly annotated one. 
 
+========================================================
+<div align="center">
+<img src="stranded_ex1.png" alt="strandedness" height="750" width="900">
+</div>
 
 Set working directory
 ========================================================
@@ -273,7 +277,7 @@ sizeFactors(dds)
 ========================================================
 
 <div align="center">
-<img src="sizefactor.png" alt="gene" height="600" width="800">
+<img src="sizefactor.png" alt="gene" height="768" width="924">
 </div>
 
 
@@ -537,7 +541,7 @@ To explore a counts matrix, it is often useful to look it as heatmap.
 ```{r,eval=TRUE,echo=TRUE}
 
 library("pheatmap")
-select <- order(rowMeans(counts(dds,normalized=TRUE)),decreasing=TRUE)[1:20]
+select <-order(rowMeans(counts(dds,normalized=TRUE)),decreasing=TRUE)[1:20]
 
 
 pheatmap(assay(rld)[select,])
@@ -578,7 +582,9 @@ sampleDists <- as.matrix(dist(t(rlogcount)))
 
  Save the plot as png file
 
-```{r,eval=FALSE,echo=TRUE}
+```{r,eval=TRUE,echo=TRUE}
+
+showcols <- brewer.pal(8, "Set1")[1:length(unique(colData(dds)$Group))]
 
  library(gplots)
 png(file="sample_dis_map.png")
@@ -816,14 +822,22 @@ Interaction terms can be added to the design formula, in order to test, for exam
 attributable to a given condition is different based on another factor, for example if the condition effect differs across genotype.
 
 A simple approach to study interaction is to perform the following steps:
-1. combine the factors of interest into a single factor with all combinations of the original factors
-2. change the design to include just this factor, e.g.  group
+
+* Combine the factors of interest into a single factor with all combinations of the original factors
+* Change the design to include just this factor, e.g.  group
 
 
-```{r,eval=FALSE,echo=TRUE}
+```{r,eval=TRUE,echo=TRUE}
 
 dds$newgroup <- factor(paste0(dds$Group, dds$Batch))
 design(dds) <- ~ newgroup
+colData(dds)
+
+```
+
+========================================================
+
+```{r,eval=TRUE,echo=TRUE}
 dds <- DESeq(dds)
 resultsNames(dds)
 results(dds, contrast=c("newgroup", "Viva", "Hfda"))
