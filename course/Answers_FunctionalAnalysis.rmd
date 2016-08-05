@@ -10,7 +10,7 @@ Website: http://bioinformatics.csc.mrc.ac.uk/training.html
 
 1.  Using the differentially expressed genes because of condition (FDR 0.05 and irrespective of fold change), perform the Gene Ontology and Pathway Enrichment Analysis.
 
-```{r,collapse=T,warning=FALSE,echo=FALSE,eval=TRUE,message=FALSE}
+```{r,collapse=T,warning=FALSE,echo=TRUE,eval=TRUE,message=FALSE}
 
 suppressPackageStartupMessages(library(DESeq2))
 
@@ -22,8 +22,6 @@ cDataE<-data.frame(name=targetsE$sample,condition=targetsE$condition,batch=targe
 
 ddsE<-DESeqDataSetFromMatrix(countData= AllCountsE,colData=cDataE,design=~batch+condition)
 ddsE<-DESeq(ddsE)
-
-
 
 resLRTorder<-results(ddsE)
 

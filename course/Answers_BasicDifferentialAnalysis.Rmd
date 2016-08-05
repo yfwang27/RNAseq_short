@@ -33,11 +33,11 @@ targets
 
 # load the count information.
 
-AllCounts<-read.csv(file="Exercise_ShortRNAseq_counts.csv",header=T,row.names=1)
+AllCountsE<-read.csv(file="Exercise_ShortRNAseq_counts.csv",header=T,row.names=1)
 
 # see the what is in the counts.csv
 
-head(AllCounts)
+head(AllCountsE)
 
 ```
 
@@ -53,9 +53,9 @@ For the batch factor, we have 3 levels, namely a, b and c.
 
 # We provide entrez_id as identifier for this exercise
 
-cData<-data.frame(name=targets$sample,condition=targets$condition,batch=targets$batch)
+cDataE<-data.frame(name=targets$sample,condition=targets$condition,batch=targets$batch)
 
-dds<-DESeqDataSetFromMatrix(countData= AllCounts,colData=cData,design=~batch+condition)
+ddsE<-DESeqDataSetFromMatrix(countData= AllCountsE,colData=cDataE,design=~condition)
 
 ```
 
@@ -66,10 +66,10 @@ dds<-DESeqDataSetFromMatrix(countData= AllCounts,colData=cData,design=~batch+con
 
 ```{r, echo=T,warnings=F,collapse=T,eval=TRUE}
 
-dds<-DESeq(dds)
+ddsE<-DESeq(ddsE)
 
 # shows how many genes were differentially expressed in KOa vs FFa, with FDR<0.05
-res1<-results(dds, contrast=c("condition","KOa","FFa"))
+res1<-results(ddsE, contrast=c("condition","KOa","FFa"))
 summary(res1,alpha=0.05)
 
 # shows how many genes were differentially expressed in KOa vs FFa, with FDR<0.05 and fold change ratio > 2
@@ -77,7 +77,7 @@ DE_res1<- res1[complete.cases(res1$padj),]
 DE_res1<- DE_res1[DE_res1$padj<0.05 & abs(DE_res1$log2FoldChange)>1,]
 
 # shows how many genes were differentially expressed in KOb vs FFa, with FDR<0.05
-res2<-results(dds, contrast=c("condition","KOb","FFa"))
+res2<-results(ddsE, contrast=c("condition","KOb","FFa"))
 
 # shows how many genes were differentially expressed in KOa vs FFa, with FDR<0.05 and fold change ratio > 2
 DE_res2<- res2[complete.cases(res2$padj),]
@@ -98,7 +98,7 @@ mart=useMart('ENSEMBL_MART_ENSEMBL',
 dataset='mmusculus_gene_ensembl',
 host="may2012.archive.ensembl.org")
 
-bm<-getBM(attributes=c('ensembl_gene_id',"gene_biotype" ,"description" ,'mgi_symbol'),filters ='ensembl_gene_id',values=rownames(res1), mart=mart)
+bm<-getBM(attributes=c('ensembl_gene_id',"gene_biotype" ,"description" ,'mgi_symbol'),filters ='entrezgene',values=rownames(res1), mart=mart)
 
 resAnnotated <- merge(as.data.frame(res1),bm,by.x=0,by.y=1)
 
@@ -117,9 +117,9 @@ plotMA(res1, main="DESeq2", ylim=c(-4,4))
  6. a) Use function plotCounts() to plot the counts for gene 497097. (b) Plot the unnormalized counts.
  
 ```{r,eval=TRUE,echo=TRUE}
-plotCounts(dds,gene="497097",intgroup="condition")
+plotCounts(ddsE,gene="497097",intgroup="condition")
 
-plotCounts(dds,gene="497097",intgroup="condition",normalized = FALSE)
+plotCounts(ddsE,gene="497097",intgroup="condition",normalized = FALSE)
 
 ```
 
