@@ -9,6 +9,8 @@ Website: http://bioinformatics.csc.mrc.ac.uk/training.html
 In this exercise, we will read in a count data from erythroblast differentiation experiment in mice. 
 This data was downloaded from GEO database (http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE49843) and aligned to mm9 genome assembly using  Rsubread R package. More details with regards to this experiment please refer to (http://www.ncbi.nlm.nih.gov/pubmed/24092935). 
 
+(Note: Gene identifiers are entrez gene ids)
+
 **Material**
 
   * Sample description: Exercise_ShortRNAseq_sample.info
