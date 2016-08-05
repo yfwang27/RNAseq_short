@@ -44,6 +44,11 @@ Analysis Considerations
 * What genome is involved?
 * Is it a well annotated organism or a poorly annotated one. 
 
+========================================================
+
+<div align="center">
+<img src="stranded_ex1.png" alt="strandedness" height="750" width="900">
+</div>
 
 Set working directory
 ========================================================
@@ -281,7 +286,7 @@ sizeFactors(dds)
 ========================================================
 
 <div align="center">
-<img src="sizefactor.png" alt="gene" height="600" width="800">
+<img src="sizefactor.png" alt="gene" height="768" width="924">
 </div>
 
 
@@ -636,7 +641,7 @@ To explore a counts matrix, it is often useful to look it as heatmap.
 
 ```r
 library("pheatmap")
-select <- order(rowMeans(counts(dds,normalized=TRUE)),decreasing=TRUE)[1:20]
+select <-order(rowMeans(counts(dds,normalized=TRUE)),decreasing=TRUE)[1:20]
 
 
 pheatmap(assay(rld)[select,])
@@ -678,6 +683,8 @@ sampleDists <- as.matrix(dist(t(rlogcount)))
 
 
 ```r
+showcols <- brewer.pal(8, "Set1")[1:length(unique(colData(dds)$Group))]
+
  library(gplots)
 png(file="sample_dis_map.png")
   heatmap.2(as.matrix(sampleDists), key=F, trace="none",
@@ -686,6 +693,11 @@ png(file="sample_dis_map.png")
     RowSideColors=showcols[colData(dds)$Group],
     margin=c(10, 10), main="Sample Distance Matrix")
 dev.off()
+```
+
+```
+quartz_off_screen 
+                2 
 ```
 
 
@@ -1006,17 +1018,77 @@ Interaction terms can be added to the design formula, in order to test, for exam
 attributable to a given condition is different based on another factor, for example if the condition effect differs across genotype.
 
 A simple approach to study interaction is to perform the following steps:
-1. combine the factors of interest into a single factor with all combinations of the original factors
-2. change the design to include just this factor, e.g.  group
+
+* Combine the factors of interest into a single factor with all combinations of the original factors
+* Change the design to include just this factor, e.g.  group
 
 
 
 ```r
 dds$newgroup <- factor(paste0(dds$Group, dds$Batch))
 design(dds) <- ~ newgroup
+colData(dds)
+```
+
+```
+DataFrame with 6 rows and 5 columns
+         name    Group    Batch sizeFactor newgroup
+     <factor> <factor> <factor>  <numeric> <factor>
+Viv1     Viv1      Viv        a  1.2430187     Viva
+Viv2     Viv2      Viv        b  0.7755226     Vivb
+Viv3     Viv3      Viv        c  1.0501449     Vivc
+Hfd1     Hfd1      Hfd        a  0.9457439     Hfda
+Hfd2     Hfd2      Hfd        b  1.0124687     Hfdb
+Hfd3     Hfd3      Hfd        c  1.0515602     Hfdc
+```
+
+========================================================
+
+
+```r
 dds <- DESeq(dds)
 resultsNames(dds)
+```
+
+```
+[1] "Intercept"    "newgroupHfda" "newgroupHfdb" "newgroupHfdc"
+[5] "newgroupViva" "newgroupVivb" "newgroupVivc"
+```
+
+```r
 results(dds, contrast=c("newgroup", "Viva", "Hfda"))
+```
+
+```
+log2 fold change (MAP): newgroup Viva vs Hfda 
+Wald test p-value: newgroup Viva vs Hfda 
+DataFrame with 37991 rows and 6 columns
+                    baseMean log2FoldChange     lfcSE      stat    pvalue
+                   <numeric>      <numeric> <numeric> <numeric> <numeric>
+ENSMUSG00000090025 0.0000000             NA        NA        NA        NA
+ENSMUSG00000064842 0.0000000             NA        NA        NA        NA
+ENSMUSG00000051951 0.9023015      -0.227423 0.1640807 -1.386044 0.1657335
+ENSMUSG00000089699 0.0000000             NA        NA        NA        NA
+ENSMUSG00000088390 0.0000000             NA        NA        NA        NA
+...                      ...            ...       ...       ...       ...
+ENSMUSG00000052831         0             NA        NA        NA        NA
+ENSMUSG00000069031         0             NA        NA        NA        NA
+ENSMUSG00000071960         0             NA        NA        NA        NA
+ENSMUSG00000091987         0             NA        NA        NA        NA
+ENSMUSG00000090600         0             NA        NA        NA        NA
+                        padj
+                   <numeric>
+ENSMUSG00000090025        NA
+ENSMUSG00000064842        NA
+ENSMUSG00000051951         1
+ENSMUSG00000089699        NA
+ENSMUSG00000088390        NA
+...                      ...
+ENSMUSG00000052831        NA
+ENSMUSG00000069031        NA
+ENSMUSG00000071960        NA
+ENSMUSG00000091987        NA
+ENSMUSG00000090600        NA
 ```
 
 
@@ -1109,7 +1181,7 @@ ENSMUSG00000033793       0    1907.0 0.12904384
    plotPWF(pwf)
 ```
 
-![plot of chunk unnamed-chunk-44](Practical_ShortRNAseq-figure/unnamed-chunk-44-1.png)
+![plot of chunk unnamed-chunk-45](Practical_ShortRNAseq-figure/unnamed-chunk-45-1.png)
 
 ========================================================
 
@@ -1218,45 +1290,47 @@ attached base packages:
 [8] methods   base     
 
 other attached packages:
- [1] pheatmap_1.0.8             biomaRt_2.28.0            
- [3] org.Mm.eg.db_3.3.0         KEGG.db_3.2.3             
- [5] AnnotationDbi_1.34.4       ggplot2_2.1.0             
- [7] RColorBrewer_1.1-2         goseq_1.24.0              
- [9] geneLenDataBase_1.8.0      BiasedUrn_1.07            
-[11] DESeq2_1.12.3              SummarizedExperiment_1.2.3
-[13] Biobase_2.32.0             GenomicRanges_1.24.2      
-[15] GenomeInfoDb_1.8.3         IRanges_2.6.1             
-[17] S4Vectors_0.10.2           BiocGenerics_0.18.0       
-[19] edgeR_3.14.0               limma_3.28.14             
-[21] knitr_1.13                
+ [1] gplots_3.0.1               pheatmap_1.0.8            
+ [3] biomaRt_2.28.0             org.Mm.eg.db_3.3.0        
+ [5] KEGG.db_3.2.3              AnnotationDbi_1.34.4      
+ [7] ggplot2_2.1.0              RColorBrewer_1.1-2        
+ [9] goseq_1.24.0               geneLenDataBase_1.8.0     
+[11] BiasedUrn_1.07             DESeq2_1.12.3             
+[13] SummarizedExperiment_1.2.3 Biobase_2.32.0            
+[15] GenomicRanges_1.24.2       GenomeInfoDb_1.8.3        
+[17] IRanges_2.6.1              S4Vectors_0.10.2          
+[19] BiocGenerics_0.18.0        edgeR_3.14.0              
+[21] limma_3.28.14              knitr_1.13                
 
 loaded via a namespace (and not attached):
  [1] Rcpp_0.12.5             locfit_1.5-9.1         
  [3] lattice_0.20-33         GO.db_3.3.0            
- [5] Rsamtools_1.24.0        Biostrings_2.40.2      
- [7] digest_0.6.9            plyr_1.8.4             
- [9] chron_2.3-47            acepack_1.3-3.3        
-[11] RSQLite_1.0.0           evaluate_0.9           
-[13] zlibbioc_1.18.0         GenomicFeatures_1.24.4 
-[15] data.table_1.9.6        annotate_1.50.0        
-[17] rpart_4.1-10            Matrix_1.2-6           
-[19] labeling_0.3            splines_3.3.0          
-[21] BiocParallel_1.6.2      geneplotter_1.50.0     
-[23] stringr_1.0.0           foreign_0.8-66         
-[25] RCurl_1.95-4.8          munsell_0.4.3          
-[27] rtracklayer_1.32.1      mgcv_1.8-12            
-[29] nnet_7.3-12             gridExtra_2.2.1        
-[31] codetools_0.2-14        Hmisc_3.17-4           
-[33] XML_3.98-1.4            GenomicAlignments_1.8.4
-[35] bitops_1.0-6            grid_3.3.0             
-[37] nlme_3.1-128            xtable_1.8-2           
-[39] gtable_0.2.0            DBI_0.4-1              
-[41] magrittr_1.5            formatR_1.4            
-[43] scales_0.4.0            stringi_1.1.1          
-[45] XVector_0.12.0          genefilter_1.54.2      
-[47] latticeExtra_0.6-28     Formula_1.2-1          
-[49] tools_3.3.0             survival_2.39-5        
-[51] colorspace_1.2-6        cluster_2.0.4          
+ [5] gtools_3.5.0            Rsamtools_1.24.0       
+ [7] Biostrings_2.40.2       digest_0.6.9           
+ [9] plyr_1.8.4              chron_2.3-47           
+[11] acepack_1.3-3.3         RSQLite_1.0.0          
+[13] evaluate_0.9            zlibbioc_1.18.0        
+[15] GenomicFeatures_1.24.4  gdata_2.17.0           
+[17] data.table_1.9.6        annotate_1.50.0        
+[19] rpart_4.1-10            Matrix_1.2-6           
+[21] labeling_0.3            splines_3.3.0          
+[23] BiocParallel_1.6.2      geneplotter_1.50.0     
+[25] stringr_1.0.0           foreign_0.8-66         
+[27] RCurl_1.95-4.8          munsell_0.4.3          
+[29] rtracklayer_1.32.1      mgcv_1.8-12            
+[31] nnet_7.3-12             gridExtra_2.2.1        
+[33] codetools_0.2-14        Hmisc_3.17-4           
+[35] XML_3.98-1.4            GenomicAlignments_1.8.4
+[37] bitops_1.0-6            grid_3.3.0             
+[39] nlme_3.1-128            xtable_1.8-2           
+[41] gtable_0.2.0            DBI_0.4-1              
+[43] magrittr_1.5            formatR_1.4            
+[45] scales_0.4.0            KernSmooth_2.23-15     
+[47] stringi_1.1.1           XVector_0.12.0         
+[49] genefilter_1.54.2       latticeExtra_0.6-28    
+[51] Formula_1.2-1           tools_3.3.0            
+[53] survival_2.39-5         colorspace_1.2-6       
+[55] cluster_2.0.4           caTools_1.17.1         
 ```
 
 

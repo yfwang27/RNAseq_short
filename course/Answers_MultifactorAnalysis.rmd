@@ -41,7 +41,7 @@ ddsE<-DESeq(ddsE)
 
 a) Find the number of genes that are changed because of condition at FDR 0.05.
 
-```{r, echo=T,warnings=F,collapse=T,eval=FALSE}
+```{r, echo=T,warnings=F,collapse=T,eval=TRUE}
 
 ddsE<-DESeqDataSetFromMatrix(countData=AllCountsE,colData=cDataE,design=~batch+condition)
 dds_conditionE <- DESeq(ddsE)
@@ -54,9 +54,8 @@ summary(resdds_conditionE,alpha=0.05)
 
 b) Find the number of genes that are changed because of batch at FDR 0.05.
 
-```{r, echo=T,warnings=F,collapse=T,eval=FALSE}
+```{r, echo=T,warnings=F,collapse=T,eval=TRUE}
 
-# LRT analysis for the batch effect
 
 ddsE<-DESeqDataSetFromMatrix(countData=AllCountsE,colData=cDataE,design=~condition+batch)
 
@@ -75,10 +74,11 @@ a) Find the number of genes that are changed because of condition at FDR 0.05.
 
 
 
-```{r, echo=T,warnings=F,collapse=T,eval=FALSE}
+```{r, echo=T,warnings=F,collapse=T,eval=TRUE}
 
+ddsE<-DESeqDataSetFromMatrix(countData=AllCountsE,colData=cDataE,design=~batch+condition)
 
-ddsLRT_conditionE <- DESeq(ddsLRTE, test="LRT", full=~batch+condition, reduced=~batch)
+ddsLRT_conditionE <- DESeq(ddsE, test="LRT", full=~batch+condition, reduced=~batch)
 
 resddsLRT_conditionE<-results(ddsLRT_conditionE)
 
@@ -88,12 +88,12 @@ summary(resddsLRT_conditionE,alpha=0.05)
 
 b) Find the number of genes that are changed because of batch at FDR 0.05.
 
-```{r, echo=T,warnings=F,collapse=T,eval=FALSE}
+```{r, echo=T,warnings=F,collapse=T,eval=TRUE}
 
 # LRT analysis for the batch effect
 
 
-ddsLRT_batchE <- DESeq(ddsLRTE, test="LRT", full=~batch+condition, reduced=~condition)
+ddsLRT_batchE <- DESeq(ddsE, test="LRT", full=~batch+condition, reduced=~condition)
 
 resddsLRT_batchE<-results(ddsLRT_batchE)
 
@@ -103,13 +103,13 @@ summary(resddsLRT_batchE,alpha=0.05)
 
 4. Introduce interaction in your design to to see if there is interaction between two factors involved in your design.
 
-```{r,eval=FALSE,echo=TRUE}
+```{r,eval=TRUE,echo=TRUE}
 
-dds$newgroup <- factor(paste0(ddsE$condition, ddsE$batch))
-design(dds) <- ~ newgroup
-dds <- DESeq(dds)
-resultsNames(dds)
-results(dds, contrast=c("newgroup", "FFaa", "KOaa"))
+ddsE$newgroup <- factor(paste0(ddsE$condition, ddsE$batch))
+design(ddsE) <- ~ newgroup
+ddsE <- DESeq(ddsE)
+resultsNames(ddsE)
+results(ddsE, contrast=c("newgroup", "FFaa", "KOaa"))
 
 ```
 

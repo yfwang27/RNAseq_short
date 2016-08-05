@@ -161,25 +161,54 @@ $(document).ready(function () {
 <pre class="r"><code>
 ddsE&lt;-DESeqDataSetFromMatrix(countData=AllCountsE,colData=cDataE,design=~batch+condition)
 dds_conditionE &lt;- DESeq(ddsE)
+## estimating size factors
+## estimating dispersions
+## gene-wise dispersion estimates
+## mean-dispersion relationship
+## final dispersion estimates
+## fitting model and testing
 
 resdds_conditionE&lt;-results(dds_conditionE)
 
 summary(resdds_conditionE,alpha=0.05)
-</code></pre>
+## 
+## out of 24695 with nonzero total read count
+## adjusted p-value &lt; 0.05
+## LFC &gt; 0 (up)     : 1184, 4.8% 
+## LFC &lt; 0 (down)   : 1214, 4.9% 
+## outliers [1]     : 0, 0% 
+## low counts [2]   : 11451, 46% 
+## (mean count &lt; 26)
+## [1] see 'cooksCutoff' argument of ?results
+## [2] see 'independentFiltering' argument of ?results</code></pre>
 <ol start="2" style="list-style-type: lower-alpha">
 <li>Find the number of genes that are changed because of batch at FDR 0.05.</li>
 </ol>
 <pre class="r"><code>
-# LRT analysis for the batch effect
 
 ddsE&lt;-DESeqDataSetFromMatrix(countData=AllCountsE,colData=cDataE,design=~condition+batch)
 
 dds_batchE &lt;- DESeq(ddsE)
+## estimating size factors
+## estimating dispersions
+## gene-wise dispersion estimates
+## mean-dispersion relationship
+## final dispersion estimates
+## fitting model and testing
 
 resdds_batchE&lt;-results(dds_batchE)
 
 summary(resdds_batchE,alpha=0.05)
-</code></pre>
+## 
+## out of 24695 with nonzero total read count
+## adjusted p-value &lt; 0.05
+## LFC &gt; 0 (up)     : 0, 0% 
+## LFC &lt; 0 (down)   : 9, 0.036% 
+## outliers [1]     : 0, 0% 
+## low counts [2]   : 14791, 60% 
+## (mean count &lt; 75)
+## [1] see 'cooksCutoff' argument of ?results
+## [2] see 'independentFiltering' argument of ?results</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li>Repeat above analysis using likelihood ratio test instead of the wald test,</li>
 </ol>
@@ -187,13 +216,29 @@ summary(resdds_batchE,alpha=0.05)
 <li>Find the number of genes that are changed because of condition at FDR 0.05.</li>
 </ol>
 <pre class="r"><code>
+ddsE&lt;-DESeqDataSetFromMatrix(countData=AllCountsE,colData=cDataE,design=~batch+condition)
 
-ddsLRT_conditionE &lt;- DESeq(ddsLRTE, test=&quot;LRT&quot;, full=~batch+condition, reduced=~batch)
+ddsLRT_conditionE &lt;- DESeq(ddsE, test=&quot;LRT&quot;, full=~batch+condition, reduced=~batch)
+## estimating size factors
+## estimating dispersions
+## gene-wise dispersion estimates
+## mean-dispersion relationship
+## final dispersion estimates
+## fitting model and testing
 
 resddsLRT_conditionE&lt;-results(ddsLRT_conditionE)
 
 summary(resddsLRT_conditionE,alpha=0.05)
-</code></pre>
+## 
+## out of 24695 with nonzero total read count
+## adjusted p-value &lt; 0.05
+## LFC &gt; 0 (up)     : 1546, 6.3% 
+## LFC &lt; 0 (down)   : 1520, 6.2% 
+## outliers [1]     : 0, 0% 
+## low counts [2]   : 9066, 37% 
+## (mean count &lt; 15)
+## [1] see 'cooksCutoff' argument of ?results
+## [2] see 'independentFiltering' argument of ?results</code></pre>
 <ol start="2" style="list-style-type: lower-alpha">
 <li>Find the number of genes that are changed because of batch at FDR 0.05.</li>
 </ol>
@@ -201,20 +246,76 @@ summary(resddsLRT_conditionE,alpha=0.05)
 # LRT analysis for the batch effect
 
 
-ddsLRT_batchE &lt;- DESeq(ddsLRTE, test=&quot;LRT&quot;, full=~batch+condition, reduced=~condition)
+ddsLRT_batchE &lt;- DESeq(ddsE, test=&quot;LRT&quot;, full=~batch+condition, reduced=~condition)
+## estimating size factors
+## estimating dispersions
+## gene-wise dispersion estimates
+## mean-dispersion relationship
+## final dispersion estimates
+## fitting model and testing
 
 resddsLRT_batchE&lt;-results(ddsLRT_batchE)
 
 summary(resddsLRT_batchE,alpha=0.05)
-</code></pre>
+## 
+## out of 24695 with nonzero total read count
+## adjusted p-value &lt; 0.05
+## LFC &gt; 0 (up)     : 25, 0.1% 
+## LFC &lt; 0 (down)   : 30, 0.12% 
+## outliers [1]     : 0, 0% 
+## low counts [2]   : 6680, 27% 
+## (mean count &lt; 8)
+## [1] see 'cooksCutoff' argument of ?results
+## [2] see 'independentFiltering' argument of ?results</code></pre>
 <ol start="4" style="list-style-type: decimal">
 <li>Introduce interaction in your design to to see if there is interaction between two factors involved in your design.</li>
 </ol>
-<pre class="r"><code>dds$newgroup &lt;- factor(paste0(ddsE$condition, ddsE$batch))
-design(dds) &lt;- ~ newgroup
-dds &lt;- DESeq(dds)
-resultsNames(dds)
-results(dds, contrast=c(&quot;newgroup&quot;, &quot;FFaa&quot;, &quot;KOaa&quot;))</code></pre>
+<pre class="r"><code>ddsE$newgroup &lt;- factor(paste0(ddsE$condition, ddsE$batch))
+design(ddsE) &lt;- ~ newgroup
+ddsE &lt;- DESeq(ddsE)</code></pre>
+<pre><code>## estimating size factors</code></pre>
+<pre><code>## estimating dispersions</code></pre>
+<pre><code>## Warning in checkForExperimentalReplicates(object, modelMatrix): same number of samples and coefficients to fit,
+##   estimating dispersion by treating samples as replicates.
+##   read the ?DESeq section on 'Experiments without replicates'</code></pre>
+<pre><code>## gene-wise dispersion estimates</code></pre>
+<pre><code>## mean-dispersion relationship</code></pre>
+<pre><code>## final dispersion estimates</code></pre>
+<pre><code>## fitting model and testing</code></pre>
+<pre class="r"><code>resultsNames(ddsE)</code></pre>
+<pre><code>##  [1] &quot;Intercept&quot;    &quot;newgroupFFaa&quot; &quot;newgroupFFab&quot; &quot;newgroupFFac&quot;
+##  [5] &quot;newgroupKOaa&quot; &quot;newgroupKOab&quot; &quot;newgroupKOac&quot; &quot;newgroupKOba&quot;
+##  [9] &quot;newgroupKObb&quot; &quot;newgroupKObc&quot;</code></pre>
+<pre class="r"><code>results(ddsE, contrast=c(&quot;newgroup&quot;, &quot;FFaa&quot;, &quot;KOaa&quot;))</code></pre>
+<pre><code>## log2 fold change (MAP): newgroup FFaa vs KOaa 
+## Wald test p-value: newgroup FFaa vs KOaa 
+## DataFrame with 26301 rows and 6 columns
+##            baseMean log2FoldChange     lfcSE       stat     pvalue
+##           &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt;  &lt;numeric&gt;  &lt;numeric&gt;
+## 497097    15.144791     -0.1020700 0.6100094 -0.1673253 0.86711413
+## 100503874 11.857320     -0.5693688 0.4846562 -1.1747890 0.24007913
+## 100038431  1.215451      0.0000000 0.2958689  0.0000000 1.00000000
+## 19888     22.922814     -1.2324903 0.6063600 -2.0326049 0.04209246
+## 20671     20.481473     -0.6066553 0.6922155 -0.8763966 0.38081445
+## ...             ...            ...       ...        ...        ...
+## 100504657         0             NA        NA         NA         NA
+## 100040308         0             NA        NA         NA         NA
+## 621831            0             NA        NA         NA         NA
+## 100040384         0             NA        NA         NA         NA
+## 100040400         0             NA        NA         NA         NA
+##                padj
+##           &lt;numeric&gt;
+## 497097    0.9856110
+## 100503874 0.6702956
+## 100038431 1.0000000
+## 19888     0.6410422
+## 20671     0.7439729
+## ...             ...
+## 100504657        NA
+## 100040308        NA
+## 621831           NA
+## 100040384        NA
+## 100040400        NA</code></pre>
 
 
 

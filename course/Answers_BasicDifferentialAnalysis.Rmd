@@ -19,7 +19,7 @@ In this exercise, we will read in a count data from erythroblast differentiation
 1. Read in the sample information and count data.
    Identify how many factors this experiment involves.
 
-```{r,collapse=T,warning=FALSE}
+```{r,collapse=T,warning=FALSE,eval=TRUE}
 
 suppressPackageStartupMessages(library(DESeq2))
 
@@ -49,7 +49,7 @@ For the batch factor, we have 3 levels, namely a, b and c.
 
 2. Construct DESeqDataSet object using sample information and counts data.
 
-```{r,collapse=T,warning=FALSE}
+```{r,collapse=T,warning=FALSE,eval=TRUE}
 
 # We provide entrez_id as identifier for this exercise
 
@@ -64,7 +64,7 @@ dds<-DESeqDataSetFromMatrix(countData= AllCounts,colData=cData,design=~batch+con
  b) Find the number of genes that are changed in the above situation with fold change threshold, i.e. fold change ratio > 2.
 
 
-```{r, echo=T,warnings=F,collapse=T}
+```{r, echo=T,warnings=F,collapse=T,eval=TRUE}
 
 dds<-DESeq(dds)
 
@@ -88,7 +88,7 @@ DE_res2<- DE_res2[DE_res2$padj<0.05 & abs(DE_res2$log2FoldChange)>1,]
 
 4. Using Biomart, add extra columns to the results dataframe such as gene name, gene biotype, gene description etc. 
 
-```{r, echo=T,warnings=F,collapse=T}
+```{r, echo=T,warnings=F,collapse=T,eval=TRUE}
 
 # Add Gene Symbols
 

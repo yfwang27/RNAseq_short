@@ -7,11 +7,10 @@ Website: http://bioinformatics.csc.mrc.ac.uk/training.html
 ---
 
 
-1.  Using the genes that are changed because of condition at FDR 0.05 irrespective of fold change as our differentially expressed genes, perform the Gene Ontology and Pathway Enrichment Analysis.
+1.  Using the differentially expressed genes because of condition (FDR 0.05 and irrespective of fold change), perform the Gene Ontology and Pathway Enrichment Analysis.
 
 
-
-2. Change the Keggpath id to name in the goseq output
+2. Annotate the goseq results further by change the Keggpath id to name.
 
 
 

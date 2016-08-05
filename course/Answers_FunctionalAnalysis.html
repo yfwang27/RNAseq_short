@@ -124,10 +124,11 @@ $(document).ready(function () {
 
 
 <ol style="list-style-type: decimal">
-<li>Using the genes that are changed because of condition at FDR 0.05 irrespective of fold change as our differentially expressed genes, perform the Gene Ontology and Pathway Enrichment Analysis.</li>
+<li>Using the differentially expressed genes because of condition (FDR 0.05 and irrespective of fold change), perform the Gene Ontology and Pathway Enrichment Analysis.</li>
 </ol>
-<pre class="r"><code>suppressPackageStartupMessages(library(KEGG.db))
-suppressPackageStartupMessages(library(goseq))
+<pre class="r"><code>suppressPackageStartupMessages(library(KEGG.db))</code></pre>
+<pre><code>## Warning: package 'AnnotationDbi' was built under R version 3.3.1</code></pre>
+<pre class="r"><code>suppressPackageStartupMessages(library(goseq))
 
 # remove the NAs
 
@@ -138,9 +139,11 @@ names(degenes)&lt;-rownames(resdat)
     
 # remove duplicate gene names
 degenes&lt;-degenes[match(unique(names(degenes)),names(degenes))]
-table(degenes)
-
-# Fitting the probability weighting function (PWF)
+table(degenes)</code></pre>
+<pre><code>## degenes
+##     0     1 
+## 10846  2398</code></pre>
+<pre class="r"><code># Fitting the probability weighting function (PWF)
 # note, we use Entrez Gene ID as identifiler for this exercise
 # we need to choose the correct &quot;id&quot; for the nullp function
 # more details see
@@ -169,9 +172,22 @@ addKeggTogoseq &lt;- function(JX,temp){
 
 restemp&lt;-addKeggTogoseq(go,temp)   
 
-head(restemp)
-
-# save the goseq result
+head(restemp)</code></pre>
+<pre><code>##        category over_represented_pvalue under_represented_pvalue
+## 1048 GO:0002376            5.865515e-25                        1
+## 1210 GO:0002682            2.646883e-17                        1
+## 3140 GO:0006955            8.393426e-17                        1
+## 3137 GO:0006952            5.101418e-16                        1
+## 702  GO:0001775            5.576621e-14                        1
+## 980  GO:0002252            1.079140e-13                        1
+##      numDEInCat numInCat                                term ontology
+## 1048        436     1525               immune system process       BP
+## 1210        254      842 regulation of immune system process       BP
+## 3140        232      758                     immune response       BP
+## 3137        249      835                    defense response       BP
+## 702         189      630                     cell activation       BP
+## 980         162      506             immune effector process       BP</code></pre>
+<pre class="r"><code># save the goseq result
 write.csv(restemp,file=&quot;Exercise_ShortRNAseq_GO_Kegg_Wallenius.csv&quot;, row.names=F)</code></pre>
 
 
