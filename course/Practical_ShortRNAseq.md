@@ -47,7 +47,7 @@ Analysis Considerations
 ========================================================
 
 <div align="center">
-<img src="stranded_ex1.png" alt="strandedness" height="750" width="900">
+<img src="stranded_ex1.png" height="750" width="900">
 </div>
 
 Set working directory
