@@ -94,7 +94,7 @@ Bioconductor packages such as Rsubreads, EDAseq, ShortRead provides functions to
 various quality metrics.
 
 
-Detailed information can be found [here](https://mrccsc.github.io/Alignment/course/Alignment.html#/13).
+Detailed information can be found [here](https://mrccsc.github.io/Alignment/course/Alignment.html#/12).
 
 
 
@@ -761,7 +761,7 @@ DESeq2 offers  two  kinds  of  hypothesis  tests:
   
   1. **Wald  test**
   
-  We  use  the  estimated  standard  error  of a  log2  fold  change  to  test  if  it  is  equal  to  zero.
+  Uses  the  estimated  standard  error  of a  log2  fold  change  to  test  if  it  is  equal  to  zero.
 
   2. **Likelihood  ratio  test  (LRT)**
   
