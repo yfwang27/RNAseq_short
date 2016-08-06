@@ -124,8 +124,22 @@ $(document).ready(function () {
 
 
 <ol style="list-style-type: decimal">
-<li>Using the differentially expressed genes because of condition (FDR 0.05 and irrespective of fold change), perform the Gene Ontology and Pathway Enrichment Analysis.</li>
+<li>Using the differentially expressed genes because of condition (FDR 0.05 and irrespective of fold change) from LTR analysis, perform the Gene Ontology and Pathway Enrichment Analysis.</li>
 </ol>
+<pre class="r"><code>
+suppressPackageStartupMessages(library(DESeq2))
+
+targetsE &lt;- read.table(&quot;Exercise_ShortRNAseq_sample.info&quot;,sep=&quot;\t&quot;,header=TRUE)
+
+AllCountsE&lt;-read.csv(file=&quot;Exercise_ShortRNAseq_counts.csv&quot;,header=T,row.names=1)
+
+cDataE&lt;-data.frame(name=targetsE$sample,condition=targetsE$condition,batch=targetsE$batch)
+
+ddsE&lt;-DESeqDataSetFromMatrix(countData= AllCountsE,colData=cDataE,design=~batch+condition)
+ddsE&lt;-DESeq(ddsE)
+
+resLRTorder&lt;-results(ddsE)
+</code></pre>
 <pre class="r"><code>suppressPackageStartupMessages(library(KEGG.db))</code></pre>
 <pre><code>## Warning: package 'AnnotationDbi' was built under R version 3.3.1</code></pre>
 <pre class="r"><code>suppressPackageStartupMessages(library(goseq))
