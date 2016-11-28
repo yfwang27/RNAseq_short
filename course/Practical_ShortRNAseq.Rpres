@@ -158,6 +158,7 @@ library(DESeq2)
 library(goseq)
 library(RColorBrewer)
 library(ggplot2)
+library("pheatmap")
 library(KEGG.db)
 library(org.Mm.eg.db)
 library(biomaRt)
@@ -282,12 +283,25 @@ A toy model for the sizeFactors
 <img src="sizefactor.png" alt="gene" height="768" width="924">
 </div>
 
-DESeq2 for the sizeFactors
+DESeq2 for the sizeFactors [optional]
 ========================================================
 
 Please refer to Equation (5):
 
 Anders S and Huber W. (2010). Differential expression analysis for sequence count data. *Genome Biol.*:11(10):R106. 
+
+$$
+\hat{s_{j}}=\begin{matrix}
+  median \\
+  i
+ \end{matrix}\frac{k_{ij}}{(\prod_{v=1}^{m}k_{iv})^{1/m}}
+ 
+ \\
+ \hat{s_{j}}:\text{estimated size factor for the jth sample}
+ \\
+ 
+$$
+The denominator of this expression can be interpreted as a pseudo-reference sample obtained by taking the geometric mean across samples. Thus, each estimated size factor is computed as the median of the ratios of the j-th sample's counts to those of the pseudo-reference.
 
 
 DESeq function - estimateDispersions()
@@ -396,7 +410,7 @@ Add Gene symbol (Continued)
 
 ```{r,eval=TRUE,echo=TRUE}    
 # Order results by adjusted p value
-resAnnotated<-resAnnotated[order(resAnnotated$pvalue,                                                                                                   decreasing=F),]
+resAnnotated<-resAnnotated[order(resAnnotated$pvalue,decreasing=F),]
 
 # show the result with gene symbol annotation
 head(resAnnotated)
@@ -592,10 +606,10 @@ sampleDists <- as.matrix(dist(t(rlogcount)))
  Save the plot as png file
 
 ```{r,eval=TRUE,echo=TRUE}
-
+library(RColorBrewer)
 showcols <- brewer.pal(8, "Set1")[1:length(unique(colData(dds)$Group))]
 
- library(gplots)
+library(gplots)
 png(file="sample_dis_map.png")
   heatmap.2(as.matrix(sampleDists), key=F, trace="none",
     col=colorpanel(100, "black", "white"),

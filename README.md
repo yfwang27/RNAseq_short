@@ -46,6 +46,13 @@ To install these,
 <pre>
 source("https://bioconductor.org/biocLite.R")
 biocLite("DESeq2")
+biocLite("goseq")
+biocLite("RColorBrewer")
+biocLite("ggplot2")
+biocLite("pheatmap")
+biocLite("KEGG.db")
+biocLite("org.Mm.eg.db")
+biocLite("biomaRt")
 </pre>
 
 #### Download the material
