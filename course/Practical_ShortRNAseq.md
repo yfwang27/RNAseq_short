@@ -47,7 +47,7 @@ Analysis Considerations
 ========================================================
 
 <div align="center">
-<img src="stranded_ex1.png" height="750" width="900">
+<img src="stranded_ex1.png" height="750" width="1000">
 </div>
 
 Set working directory
@@ -283,11 +283,32 @@ sizeFactors(dds)
 1.2430187 0.7755226 1.0501449 0.9457439 1.0124687 1.0515602 
 ```
 
+A toy model for the sizeFactors
 ========================================================
 
 <div align="center">
 <img src="sizefactor.png" alt="gene" height="768" width="924">
 </div>
+
+DESeq2 for the sizeFactors [optional]
+========================================================
+
+Please refer to Equation (5):
+
+Anders S and Huber W. (2010). Differential expression analysis for sequence count data. *Genome Biol.*:11(10):R106. 
+
+$$
+\hat{s_{j}}=\begin{matrix}
+  median \\
+  i
+ \end{matrix}\frac{k_{ij}}{(\prod_{v=1}^{m}k_{iv})^{1/m}}
+ 
+ \\
+ \hat{s_{j}}:\text{estimated size factor for the jth sample}
+ \\
+ 
+$$
+The denominator of this expression can be interpreted as a pseudo-reference sample obtained by taking the geometric mean across samples. Thus, each estimated size factor is computed as the median of the ratios of the j-th sample's counts to those of the pseudo-reference.
 
 
 DESeq function - estimateDispersions()
@@ -453,7 +474,7 @@ Add Gene symbol (Continued)
 
 ```r
 # Order results by adjusted p value
-resAnnotated<-resAnnotated[order(resAnnotated$pvalue,                                                                                                   decreasing=F),]
+resAnnotated<-resAnnotated[order(resAnnotated$pvalue,decreasing=F),]
 
 # show the result with gene symbol annotation
 head(resAnnotated)
@@ -683,9 +704,10 @@ sampleDists <- as.matrix(dist(t(rlogcount)))
 
 
 ```r
+library(RColorBrewer)
 showcols <- brewer.pal(8, "Set1")[1:length(unique(colData(dds)$Group))]
 
- library(gplots)
+library(gplots)
 png(file="sample_dis_map.png")
   heatmap.2(as.matrix(sampleDists), key=F, trace="none",
     col=colorpanel(100, "black", "white"),
