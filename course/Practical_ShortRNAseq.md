@@ -4,7 +4,7 @@
 Analysis of RNAseq data
 ========================================================
 author:MRC CSC Bioinformatics Core
-date:[http://mrccsc.github.io/RNAseq_short/]
+date:http://mrccsc.github.io/RNAseq_short/
 width: 1440
 height: 1100
 autosize: true
@@ -38,11 +38,12 @@ Contents
 Analysis Considerations
 ========================================================
 
-* Single end or Paired end sequencing experiment?
-* Strand specific or non stand specific
-* How many factors involved in experiment (genotype, treatment, time course etc.)
 * What genome is involved?
 * Is it a well annotated organism or a poorly annotated one. 
+* How many factors involved in experiment (genotype, treatment, time course etc.)
+* Single end or Paired end sequencing experiment?
+* Strand specific or non stand specific
+
 
 ========================================================
 
@@ -283,19 +284,19 @@ sizeFactors(dds)
 1.2430187 0.7755226 1.0501449 0.9457439 1.0124687 1.0515602 
 ```
 
-A toy model for the sizeFactors
+Calculating  sizeFactors
 ========================================================
 
 <div align="center">
 <img src="sizefactor.png" alt="gene" height="768" width="924">
 </div>
 
-DESeq2 for the sizeFactors [optional]
+DESeq2 calculation of the sizeFactors 
 ========================================================
 
 Please refer to Equation (5):
 
-Anders S and Huber W. (2010). Differential expression analysis for sequence count data. *Genome Biol.*:11(10):R106. 
+**Anders S and Huber W. (2010). Differential expression analysis for sequence count data. *Genome Biol.*:11(10):R106.**
 
 $$
 \hat{s_{j}}=\begin{matrix}
