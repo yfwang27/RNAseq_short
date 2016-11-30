@@ -41,10 +41,14 @@ Analysis Considerations
 ========================================================
 
 * What genome is involved?
-* Is it a well annotated organism or a poorly annotated one. 
+   - Is it a well annotated organism or a poorly annotated one?
+   - A different analysis strategy depending on the genome?
 * How many factors involved in experiment (genotype, treatment, time course etc.)
+   - Single factor vs multi factor analysis?
+   - Interactions?
 * Single end or Paired end sequencing experiment?
 * Strand specific or non stand specific
+  - Useful to detect antisense transcripts  
 
 
 ========================================================
